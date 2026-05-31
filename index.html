@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aaden's Summer Bridge Study Guide</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        h1 { text-align: center; font-size: 1.8em; margin-bottom: 5px; }
+        .subtitle { text-align: center; color: #666; margin-bottom: 30px; font-size: 1.1em; }
+        .subject-card {
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .subject-card:hover { border-color: #667eea; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .subject-card h2 { font-size: 1.3em; margin-bottom: 5px; }
+        .subject-card p { color: #666; font-size: 0.95em; }
+        .quiz-section { display: none; }
+        .quiz-section.active { display: block; }
+        .question {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .question p { font-weight: 600; margin-bottom: 12px; font-size: 1.05em; }
+        .question label {
+            display: block;
+            padding: 10px 15px;
+            margin: 5px 0;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .question label:hover { border-color: #667eea; background: #f0f0ff; }
+        .question label.correct { border-color: #28a745; background: #d4edda; }
+        .question label.wrong { border-color: #dc3545; background: #f8d7da; }
+        .explanation {
+            display: none;
+            background: #e8f5e9;
+            border-left: 4px solid #28a745;
+            padding: 12px 15px;
+            margin-top: 10px;
+            border-radius: 0 8px 8px 0;
+            font-size: 0.9em;
+        }
+        .btn {
+            display: inline-block;
+            padding: 12px 24px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .btn:hover { background: #5a6fd6; }
+        .btn-back { background: #6c757d; }
+        .score-box {
+            text-align: center;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border-radius: 12px;
+            margin-top: 20px;
+            font-size: 1.2em;
+        }
+        .passage {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 0 8px 8px 0;
+            font-style: italic;
+            line-height: 1.6;
+        }
+        .spelling-table { width: 100%; border-collapse: collapse; margin: 15px 0; }
+        .spelling-table th, .spelling-table td { padding: 10px; text-align: left; border-bottom: 1px solid #e0e0e0; }
+        .spelling-table tr:hover { background: #f8f9fa; }
+        .progress-bar-container {
+            background: #e0e0e0;
+            border-radius: 10px;
+            height: 20px;
+            margin: 10px 0;
+            overflow: hidden;
+        }
+        .progress-bar-fill {
+            height: 100%;
+            border-radius: 10px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            transition: width 0.5s ease;
+        }
+        .tracker-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            border-bottom: 1px solid #f0f0f0;
+            gap: 12px;
+        }
+        .tracker-item:last-child { border-bottom: none; }
+        .tracker-check {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            border: 2px solid #e0e0e0;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: all 0.2s;
+        }
+        .tracker-check.done {
+            background: #28a745;
+            border-color: #28a745;
+            color: white;
+        }
+        .tracker-label { flex: 1; }
+        .tracker-label.done-text { text-decoration: line-through; color: #999; }
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: 600;
+            margin: 3px;
+        }
+        .badge-locked { background: #e0e0e0; color: #999; }
+        .badge-earned { background: #fff3cd; color: #856404; }
+        .week-header {
+            font-weight: 700;
+            font-size: 1.1em;
+            margin: 20px 0 8px;
+            padding-left: 5px;
+            color: #667eea;
+        }
+        .overall-progress { text-align: center; margin-bottom: 20px; }
+        .overall-progress .pct { font-size: 2em; font-weight: 700; color: #667eea; }
+        @media (max-width: 600px) {
+            .container { padding: 20px 15px; }
+            h1 { font-size: 1.5em; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <!-- HOME -->
+    <div id="home" class="quiz-section active">
+        <h1>📚 Aaden's Study Guide</h1>
+        <p class="subtitle">6th → 7th Grade Summer Bridge</p>
+
+        <div class="subject-card" onclick="showSection('ela-menu')">
+            <h2>📖 English Language Arts</h2>
+            <p>Synonyms, antonyms, spelling, reading passages & hidden meanings</p>
+        </div>
+        <div class="subject-card" onclick="showSection('math')">
+            <h2>🧮 Mathematics</h2>
+            <p>Fractions, decimals, ratios, integers, equations & proportions</p>
+        </div>
+        <div class="subject-card" onclick="showSection('science')">
+            <h2>🔬 Science</h2>
+            <p>Cell biology, ecosystems, earth science, chemistry & physics</p>
+        </div>
+        <div class="subject-card" onclick="showSection('spelling')">
+            <h2>✍️ Spelling Challenge</h2>
+            <p>Top 20 tricky 7th-grade words with memory tricks</p>
+        </div>
+        <div class="subject-card" onclick="showSection('progress')" style="border-color: #667eea; background: #f8f9ff;">
+            <h2>📊 My Progress</h2>
+            <p id="home-progress-summary">Track your weekly goals, scores & achievements</p>
+        </div>
+    </div>
+
+    <!-- ELA MENU -->
+    <div id="ela-menu" class="quiz-section">
+        <h1>📖 English Language Arts</h1>
+        <p class="subtitle">Choose a quiz:</p>
+        <div class="subject-card" onclick="showSection('ela-vocab')">
+            <h2>Part A: Synonyms, Antonyms & Context</h2>
+            <p>4 questions testing word relationships</p>
+        </div>
+        <div class="subject-card" onclick="showSection('ela-reading')">
+            <h2>Part B: The Fireburn of Frederiksted</h2>
+            <p>USVI history reading passage with inference questions</p>
+        </div>
+        <br>
+        <button class="btn btn-back" onclick="showSection('home')">← Back</button>
+    </div>
+
+    <!-- ELA VOCAB QUIZ -->
+    <div id="ela-vocab" class="quiz-section">
+        <h1>📖 Synonyms, Antonyms & Context</h1>
+        <div class="question" id="eq1">
+            <p>1. "The sailor was cautious as the storm approached St. Thomas." Which word means the same as <em>cautious</em>?</p>
+            <label onclick="checkAnswer(this, true, 'eq1')"><input type="radio" name="eq1"> B) Careful</label>
+            <label onclick="checkAnswer(this, false, 'eq1')"><input type="radio" name="eq1"> A) Brave</label>
+            <label onclick="checkAnswer(this, false, 'eq1')"><input type="radio" name="eq1"> C) Terrified</label>
+            <div class="explanation">✅ Cautious means taking extra care to avoid danger or mistakes.</div>
+        </div>
+        <div class="question" id="eq2">
+            <p>2. What is the exact opposite of the word <em>permanent</em>?</p>
+            <label onclick="checkAnswer(this, false, 'eq2')"><input type="radio" name="eq2"> A) Lasting</label>
+            <label onclick="checkAnswer(this, true, 'eq2')"><input type="radio" name="eq2"> B) Temporary</label>
+            <label onclick="checkAnswer(this, false, 'eq2')"><input type="radio" name="eq2"> C) Broken</label>
+            <div class="explanation">✅ Permanent means lasting forever; temporary means lasting for only a limited time.</div>
+        </div>
+        <div class="question" id="eq3">
+            <p>3. "The structural damage to the old dock was immense, requiring months of intense labor to repair." <em>Immense</em> means:</p>
+            <label onclick="checkAnswer(this, false, 'eq3')"><input type="radio" name="eq3"> A) Tiny</label>
+            <label onclick="checkAnswer(this, false, 'eq3')"><input type="radio" name="eq3"> B) Standard</label>
+            <label onclick="checkAnswer(this, true, 'eq3')"><input type="radio" name="eq3"> C) Massive</label>
+            <div class="explanation">✅ The clue is "months of intense labor," which indicates the damage was incredibly large.</div>
+        </div>
+        <div class="question" id="eq4">
+            <p>4. Choose the sentence with the correct spelling:</p>
+            <label onclick="checkAnswer(this, false, 'eq4')"><input type="radio" name="eq4"> A) Their going to the beach after school.</label>
+            <label onclick="checkAnswer(this, false, 'eq4')"><input type="radio" name="eq4"> B) There going to the beach after school.</label>
+            <label onclick="checkAnswer(this, true, 'eq4')"><input type="radio" name="eq4"> C) They're going to the beach after school.</label>
+            <div class="explanation">✅ "They're" is short for "they are." "There" is a place. "Their" shows ownership.</div>
+        </div>
+        <div class="score-box" id="ela-vocab-score" style="display:none"></div>
+        <br>
+        <button class="btn btn-back" onclick="showSection('ela-menu')">← Back</button>
+    </div>
+
+    <!-- ELA READING -->
+    <div id="ela-reading" class="quiz-section">
+        <h1>📖 The Fireburn of Frederiksted</h1>
+        <p class="subtitle">Read carefully, then answer the questions below.</p>
+        <div class="passage">
+            In October 1878, thirty years after slavery was abolished in the Danish West Indies, the air in St. Croix grew thick with a different kind of heat. Freedom had arrived on paper, but the laborers on the sugar plantations still found themselves locked in invisible chains—bound by laws that forced them into low-paying, multi-year contracts with no right to leave their estates.<br><br>
+            Then, a woman named Mary Thomas stepped into the light. Known to history as "Queen Mary," she did not carry official power or military weapons. Instead, she carried a torch and a fierce determination. Alongside other labor leaders, she marched. When the sugar cane fields burned that night, the smoke that filled the Caribbean sky wasn't just a sign of destruction; it was a loud, unavoidable message written in ash that the old ways could no longer stand.
+        </div>
+        <div class="question" id="rq1">
+            <p>1. The author writes the laborers were "locked in invisible chains." What does this phrase really mean?</p>
+            <label onclick="checkAnswer(this, false, 'rq1')"><input type="radio" name="rq1"> A) The laborers were wearing magic, see-through handcuffs.</label>
+            <label onclick="checkAnswer(this, true, 'rq1')"><input type="radio" name="rq1"> B) Even though slavery was over, unfair laws still kept the workers trapped and powerless.</label>
+            <label onclick="checkAnswer(this, false, 'rq1')"><input type="radio" name="rq1"> C) The plantation owners forgot to unlock the gates to the fields.</label>
+            <div class="explanation">✅ The "chains" are a <strong>metaphor</strong> for unfair economic rules that restricted freedom.</div>
+        </div>
+        <div class="question" id="rq2">
+            <p>2. In the passage, the word <em>abolished</em> means:</p>
+            <label onclick="checkAnswer(this, false, 'rq2')"><input type="radio" name="rq2"> A) Expanded or made larger.</label>
+            <label onclick="checkAnswer(this, false, 'rq2')"><input type="radio" name="rq2"> B) Forgotten or misplaced.</label>
+            <label onclick="checkAnswer(this, true, 'rq2')"><input type="radio" name="rq2"> C) Ended or officially done away with.</label>
+            <div class="explanation">✅ To abolish something means to formally and completely end it.</div>
+        </div>
+        <div class="question" id="rq3">
+            <p>3. The smoke was "a loud, unavoidable message written in ash." What is the hidden meaning?</p>
+            <label onclick="checkAnswer(this, false, 'rq3')"><input type="radio" name="rq3"> A) The workers were trying to use smoke signals to talk to other islands.</label>
+            <label onclick="checkAnswer(this, true, 'rq3')"><input type="radio" name="rq3"> B) The fire was a powerful protest that forced the government to notice their suffering.</label>
+            <label onclick="checkAnswer(this, false, 'rq3')"><input type="radio" name="rq3"> C) The fire accidentally got out of hand because it was a windy night.</label>
+            <div class="explanation">✅ The ash and smoke represent making invisible problems visible to the entire island.</div>
+        </div>
+        <div class="score-box" id="ela-reading-score" style="display:none"></div>
+        <br>
+        <button class="btn btn-back" onclick="showSection('ela-menu')">← Back</button>
+    </div>
+
+    <!-- MATH QUIZ -->
+    <div id="math" class="quiz-section">
+        <h1>🧮 Math Diagnostic Quiz</h1>
+        <div class="question" id="mq1">
+            <p>1. (6th Grade) What is 3/4 ÷ 1/2?</p>
+            <label onclick="checkAnswer(this, false, 'mq1')"><input type="radio" name="mq1"> A) 3/8</label>
+            <label onclick="checkAnswer(this, true, 'mq1')"><input type="radio" name="mq1"> B) 3/2 (or 1½)</label>
+            <label onclick="checkAnswer(this, false, 'mq1')"><input type="radio" name="mq1"> C) 1/4</label>
+            <div class="explanation">✅ Keep, Change, Flip: 3/4 × 2/1 = 6/4 = 3/2</div>
+        </div>
+        <div class="question" id="mq2">
+            <p>2. (6th Grade) Solve 1.25 × 4</p>
+            <label onclick="checkAnswer(this, false, 'mq2')"><input type="radio" name="mq2"> A) 4.25</label>
+            <label onclick="checkAnswer(this, true, 'mq2')"><input type="radio" name="mq2"> B) 5</label>
+            <label onclick="checkAnswer(this, false, 'mq2')"><input type="radio" name="mq2"> C) 5.25</label>
+            <div class="explanation">✅ 125 × 4 = 500, then place the decimal: 5.00 = 5</div>
+        </div>
+        <div class="question" id="mq3">
+            <p>3. (6th Grade) A recipe uses 2 cups of sugar for 5 cups of flour. What is the ratio of sugar to flour?</p>
+            <label onclick="checkAnswer(this, true, 'mq3')"><input type="radio" name="mq3"> A) 2:5</label>
+            <label onclick="checkAnswer(this, false, 'mq3')"><input type="radio" name="mq3"> B) 5:2</label>
+            <label onclick="checkAnswer(this, false, 'mq3')"><input type="radio" name="mq3"> C) 2:7</label>
+            <div class="explanation">✅ Ratios compare quantities in the order they are asked: sugar TO flour = 2:5</div>
+        </div>
+        <div class="question" id="mq4">
+            <p>4. (6th Grade) Simplify: 3(x + 4)</p>
+            <label onclick="checkAnswer(this, false, 'mq4')"><input type="radio" name="mq4"> A) 3x + 4</label>
+            <label onclick="checkAnswer(this, true, 'mq4')"><input type="radio" name="mq4"> B) 3x + 12</label>
+            <label onclick="checkAnswer(this, false, 'mq4')"><input type="radio" name="mq4"> C) 7x</label>
+            <div class="explanation">✅ Distributive property: multiply 3 by both x AND 4.</div>
+        </div>
+        <div class="question" id="mq5">
+            <p>5. (7th Grade) Solve: -3 + (-5)</p>
+            <label onclick="checkAnswer(this, true, 'mq5')"><input type="radio" name="mq5"> A) -8</label>
+            <label onclick="checkAnswer(this, false, 'mq5')"><input type="radio" name="mq5"> B) -2</label>
+            <label onclick="checkAnswer(this, false, 'mq5')"><input type="radio" name="mq5"> C) 8</label>
+            <div class="explanation">✅ Adding a negative = moving further left on the number line: -3 + (-5) = -8</div>
+        </div>
+        <div class="question" id="mq6">
+            <p>6. (7th Grade) If 2x + 5 = 13, what is x?</p>
+            <label onclick="checkAnswer(this, false, 'mq6')"><input type="radio" name="mq6"> A) 9</label>
+            <label onclick="checkAnswer(this, true, 'mq6')"><input type="radio" name="mq6"> B) 4</label>
+            <label onclick="checkAnswer(this, false, 'mq6')"><input type="radio" name="mq6"> C) 6</label>
+            <div class="explanation">✅ Subtract 5 from both sides: 2x = 8. Divide by 2: x = 4.</div>
+        </div>
+        <div class="question" id="mq7">
+            <p>7. (7th Grade) If 3 notebooks cost $6, how much do 7 notebooks cost?</p>
+            <label onclick="checkAnswer(this, false, 'mq7')"><input type="radio" name="mq7"> A) $12</label>
+            <label onclick="checkAnswer(this, true, 'mq7')"><input type="radio" name="mq7"> B) $14</label>
+            <label onclick="checkAnswer(this, false, 'mq7')"><input type="radio" name="mq7"> C) $21</label>
+            <div class="explanation">✅ Unit rate: $6 ÷ 3 = $2 each. Then $2 × 7 = $14.</div>
+        </div>
+        <div class="question" id="mq8">
+            <p>8. (7th Grade) A ferry travels 15 miles in 30 minutes. What is its speed per hour?</p>
+            <label onclick="checkAnswer(this, false, 'mq8')"><input type="radio" name="mq8"> A) 15 mph</label>
+            <label onclick="checkAnswer(this, true, 'mq8')"><input type="radio" name="mq8"> B) 30 mph</label>
+            <label onclick="checkAnswer(this, false, 'mq8')"><input type="radio" name="mq8"> C) 45 mph</label>
+            <div class="explanation">✅ Double the 30-minute distance: 15 × 2 = 30 miles per hour.</div>
+        </div>
+        <div class="score-box" id="math-score" style="display:none"></div>
+        <br>
+        <button class="btn btn-back" onclick="showSection('home')">← Back</button>
+    </div>
+
+    <!-- SCIENCE QUIZ -->
+    <div id="science" class="quiz-section">
+        <h1>🔬 Science Diagnostic Quiz</h1>
+        <div class="question" id="sq1">
+            <p>1. (6th Grade) What organelle is known as the "powerhouse" of the cell?</p>
+            <label onclick="checkAnswer(this, true, 'sq1')"><input type="radio" name="sq1"> A) Mitochondria</label>
+            <label onclick="checkAnswer(this, false, 'sq1')"><input type="radio" name="sq1"> B) Nucleus</label>
+            <label onclick="checkAnswer(this, false, 'sq1')"><input type="radio" name="sq1"> C) Ribosome</label>
+            <div class="explanation">✅ The mitochondria generates the cell's chemical energy (ATP).</div>
+        </div>
+        <div class="question" id="sq2">
+            <p>2. (6th Grade) What is the primary source of energy for most ecosystems on Earth?</p>
+            <label onclick="checkAnswer(this, false, 'sq2')"><input type="radio" name="sq2"> A) Water</label>
+            <label onclick="checkAnswer(this, true, 'sq2')"><input type="radio" name="sq2"> B) The Sun</label>
+            <label onclick="checkAnswer(this, false, 'sq2')"><input type="radio" name="sq2"> C) Soil</label>
+            <div class="explanation">✅ The Sun provides radiation that plants use in photosynthesis, starting the food chain.</div>
+        </div>
+        <div class="question" id="sq3">
+            <p>3. (6th Grade) Name the three primary layers of the Earth:</p>
+            <label onclick="checkAnswer(this, true, 'sq3')"><input type="radio" name="sq3"> A) Crust, mantle, and core</label>
+            <label onclick="checkAnswer(this, false, 'sq3')"><input type="radio" name="sq3"> B) Surface, middle, and center</label>
+            <label onclick="checkAnswer(this, false, 'sq3')"><input type="radio" name="sq3"> C) Rock, magma, and iron</label>
+            <div class="explanation">✅ The three structural layers are the crust (outer), mantle (middle), and core (inner).</div>
+        </div>
+        <div class="question" id="sq4">
+            <p>4. (6th Grade) Water turning from a liquid into a gas is called:</p>
+            <label onclick="checkAnswer(this, false, 'sq4')"><input type="radio" name="sq4"> A) Condensation</label>
+            <label onclick="checkAnswer(this, true, 'sq4')"><input type="radio" name="sq4"> B) Evaporation</label>
+            <label onclick="checkAnswer(this, false, 'sq4')"><input type="radio" name="sq4"> C) Precipitation</label>
+            <div class="explanation">✅ Evaporation is the phase change from liquid to gas.</div>
+        </div>
+        <div class="question" id="sq5">
+            <p>5. (7th Grade) What is the difference between an atom and a molecule?</p>
+            <label onclick="checkAnswer(this, false, 'sq5')"><input type="radio" name="sq5"> A) They are the same thing</label>
+            <label onclick="checkAnswer(this, true, 'sq5')"><input type="radio" name="sq5"> B) An atom is a single building block; a molecule is two or more atoms bonded together</label>
+            <label onclick="checkAnswer(this, false, 'sq5')"><input type="radio" name="sq5"> C) A molecule is smaller than an atom</label>
+            <div class="explanation">✅ Atoms are individual elements. When atoms bond together, they form molecules.</div>
+        </div>
+        <div class="question" id="sq6">
+            <p>6. (7th Grade) What happens at a convergent plate boundary?</p>
+            <label onclick="checkAnswer(this, true, 'sq6')"><input type="radio" name="sq6"> A) Mountains form, or earthquakes and volcanoes occur</label>
+            <label onclick="checkAnswer(this, false, 'sq6')"><input type="radio" name="sq6"> B) Plates slide past each other smoothly</label>
+            <label onclick="checkAnswer(this, false, 'sq6')"><input type="radio" name="sq6"> C) New ocean floor is created</label>
+            <div class="explanation">✅ Convergent = plates colliding, pushing land up into mountains or causing quakes.</div>
+        </div>
+        <div class="question" id="sq7">
+            <p>7. (7th Grade) What happens to water molecules when liquid water boils into steam?</p>
+            <label onclick="checkAnswer(this, true, 'sq7')"><input type="radio" name="sq7"> A) They speed up and spread further apart</label>
+            <label onclick="checkAnswer(this, false, 'sq7')"><input type="radio" name="sq7"> B) They slow down and stick together</label>
+            <label onclick="checkAnswer(this, false, 'sq7')"><input type="radio" name="sq7"> C) They disappear completely</label>
+            <div class="explanation">✅ Heat energy makes molecules move faster, breaking bonds and spreading apart.</div>
+        </div>
+        <div class="question" id="sq8">
+            <p>8. (7th Grade) Plants use sunlight, water, and CO₂ to make food. This process is called:</p>
+            <label onclick="checkAnswer(this, false, 'sq8')"><input type="radio" name="sq8"> A) Respiration</label>
+            <label onclick="checkAnswer(this, true, 'sq8')"><input type="radio" name="sq8"> B) Photosynthesis</label>
+            <label onclick="checkAnswer(this, false, 'sq8')"><input type="radio" name="sq8"> C) Fermentation</label>
+            <div class="explanation">✅ Photo (light) + synthesis (making) = making food from light.</div>
+        </div>
+        <div class="score-box" id="science-score" style="display:none"></div>
+        <br>
+        <button class="btn btn-back" onclick="showSection('home')">← Back</button>
+    </div>
+
+    <!-- SPELLING -->
+    <div id="spelling" class="quiz-section">
+        <h1>✍️ Spelling Challenge</h1>
+        <p class="subtitle">Top 20 tricky words for 7th grade. Study the traps!</p>
+        <table class="spelling-table">
+            <tr><th>#</th><th>Word</th><th>Trap / Memory Trick</th></tr>
+            <tr><td>1</td><td><strong>Caribbean</strong></td><td>One 'r', double 'b'</td></tr>
+            <tr><td>2</td><td><strong>Separate</strong></td><td>Has "a rat" in the middle: sep-<em>a-rat</em>-e</td></tr>
+            <tr><td>3</td><td><strong>Definitely</strong></td><td>No 'a' in this word; ends in "-itely"</td></tr>
+            <tr><td>4</td><td><strong>Embarrass</strong></td><td>Double 'b' and double 'r'</td></tr>
+            <tr><td>5</td><td><strong>Necessary</strong></td><td>One 'c', double 's'</td></tr>
+            <tr><td>6</td><td><strong>Environment</strong></td><td>Silent 'n' in the middle</td></tr>
+            <tr><td>7</td><td><strong>Recommend</strong></td><td>One 'c', double 'm'</td></tr>
+            <tr><td>8</td><td><strong>Noticeable</strong></td><td>Keep the 'e' before "-able"</td></tr>
+            <tr><td>9</td><td><strong>Mischievous</strong></td><td>Say: mis-chiv-us (NOT mis-chee-vee-us)</td></tr>
+            <tr><td>10</td><td><strong>Occurred</strong></td><td>Double 'c' and double 'r'</td></tr>
+            <tr><td>11</td><td><strong>Believe</strong></td><td>"I" before "E" except after "C"</td></tr>
+            <tr><td>12</td><td><strong>Foreign</strong></td><td>Breaks the "I before E" rule!</td></tr>
+            <tr><td>13</td><td><strong>Language</strong></td><td>Watch the "ua" vowel blend</td></tr>
+            <tr><td>14</td><td><strong>Exaggerate</strong></td><td>Double 'g'</td></tr>
+            <tr><td>15</td><td><strong>Independent</strong></td><td>Ends in "-ent", NOT "-ant"</td></tr>
+            <tr><td>16</td><td><strong>Knowledge</strong></td><td>Silent 'd' before the 'g'</td></tr>
+            <tr><td>17</td><td><strong>Maintenance</strong></td><td>"maintain" becomes "main-ten-ance"</td></tr>
+            <tr><td>18</td><td><strong>Schedule</strong></td><td>The "sch" blend tricks people</td></tr>
+            <tr><td>19</td><td><strong>Guarantee</strong></td><td>Starts with "gua"</td></tr>
+            <tr><td>20</td><td><strong>Government</strong></td><td>Don't drop the 'n' people skip</td></tr>
+        </table>
+        <br>
+        <button class="btn btn-back" onclick="showSection('home')">← Back</button>
+    </div>
+
+    <!-- PROGRESS TRACKER -->
+    <div id="progress" class="quiz-section">
+        <h1>📊 My Progress</h1>
+        <div class="overall-progress">
+            <div class="pct" id="overall-pct">0%</div>
+            <p>Overall Completion</p>
+            <div class="progress-bar-container">
+                <div class="progress-bar-fill" id="overall-bar" style="width: 0%"></div>
+            </div>
+        </div>
+
+        <div class="week-header">📅 Week 1: Foundation Review</div>
+        <div class="tracker-item"><div class="tracker-check" onclick="toggleTask(this)" data-task="w1-ela-vocab">✓</div><span class="tracker-label">Complete ELA Synonyms & Antonyms Quiz</span></div>
+        <div class="tracker-item"><div class="tracker-check" onclick="toggleTask(this)" data-task="w1-math-diag">✓</div><span class="tracker-label">Complete Math Diagnostic Quiz</span></div>
+        <div class="tracker-item"><div class="tracker-check" onclick="toggleTask(this)" data-task="w1-sci-diag">✓</div><span class="tracker-label">Complete Science Diagnostic Quiz</span></div>
+        <div class="tracker-item"><div class="tracker-check" onclick="toggleTask(this)" data-task="w1-spelling1">✓</div><span class="tracker-label">Study Spelling List (Round 1)</span></div>
+
+        <div class="week-header">📅 Week 2: Deep Dive</div>
+        <div class="tracker-item"><div class="tracker-check" onclick="toggleTask(this)" data-task="w2-fireburn">✓</div><span class="tracker-label">Read Fireburn passage & answer inference questions</span></div>
+        <div class="tracker-item"><div class="tracker-check" onclick="toggleTask(this)" data-task="w2-integers">✓</div><span class="tracker-label">Complete Integers Lesson + Practice</span></div>
+        <div class="tracker-item"><div class="tracker-check" onclick="toggleTask(this)" data-task="w2-atoms">✓</div><span class="tracker-label">Complete Atoms & Molecules Lesson</span></div>
+        <div class="tracker-item"><div class="tracker-check" onclick="toggleTask(this)" data-task="w2-spelling2">✓</div><span class="tracker-label">Study Spelling List (Round 2)</span></div>
+
+        <div class="week-header">📅 Week 3: Level Up</div>
+        <div class="tracker-item"><div class="tracker-check" onclick="toggleTask(this)" data-task="w3-vocabulary">✓</div><span class="tracker-label">Complete Vocabulary Power Lesson</span></div>
+        <div class="tracker-item"><div class="tracker-check" onclick="toggleTask(this)" data-task="w3-equations">✓</div><span class="tracker-label">Complete Equations Lesson + Practice</span></div>
+        <div class="tracker-item"><div class="tracker-check" onclick="toggleTask(this)" data-task="w3-tectonics">✓</div><span class="tracker-label">Complete Plate Tectonics Lesson</span></div>
+        <div class="tracker-item"><div class="tracker-check" onclick="toggleTask(this)" data-task="w3-spelling3">✓</div><span class="tracker-label">Study Spelling List (Round 3)</span></div>
+
+        <div class="week-header">📅 Week 4: Mastery</div>
+        <div class="tracker-item"><div class="tracker-check" onclick="toggleTask(this)" data-task="w4-inference">✓</div><span class="tracker-label">Complete Inference & Hidden Meanings Lesson</span></div>
+        <div class="tracker-item"><div class="tracker-check" onclick="toggleTask(this)" data-task="w4-proportions">✓</div><span class="tracker-label">Complete Proportions & Unit Rates Lesson</span></div>
+        <div class="tracker-item"><div class="tracker-check" onclick="toggleTask(this)" data-task="w4-retake">✓</div><span class="tracker-label">Retake all quizzes — beat your first score!</span></div>
+        <div class="tracker-item"><div class="tracker-check" onclick="toggleTask(this)" data-task="w4-spellingfinal">✓</div><span class="tracker-label">Spelling Test: all 20 words from memory</span></div>
+
+        <div class="week-header">🏆 Achievements</div>
+        <div id="badges">
+            <span class="badge badge-locked" id="badge-first">🏅 First Quiz</span>
+            <span class="badge badge-locked" id="badge-ela">📖 Bookworm</span>
+            <span class="badge badge-locked" id="badge-math">🧮 Math Wizard</span>
+            <span class="badge badge-locked" id="badge-science">🔬 Science Star</span>
+            <span class="badge badge-locked" id="badge-spelling">✍️ Spelling Bee</span>
+            <span class="badge badge-locked" id="badge-master">🏆 Bridge Master</span>
+        </div>
+        <br>
+        <button class="btn" onclick="resetProgress()">🔄 Reset All Progress</button>
+        <button class="btn btn-back" onclick="showSection('home')">← Back</button>
+    </div>
+</div>
+
+<script>
+    let scores = {};
+
+    function showSection(id) {
+        document.querySelectorAll('.quiz-section').forEach(s => s.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        window.scrollTo(0, 0);
+        if (id === 'progress') updateProgressUI();
+    }
+
+    function checkAnswer(label, isCorrect, questionId) {
+        const question = document.getElementById(questionId);
+        if (question.dataset.answered) return;
+        question.dataset.answered = 'true';
+
+        const section = question.closest('.quiz-section').id;
+        if (!scores[section]) scores[section] = { correct: 0, total: 0 };
+        scores[section].total++;
+
+        if (isCorrect) {
+            label.classList.add('correct');
+            scores[section].correct++;
+        } else {
+            label.classList.add('wrong');
+            question.querySelectorAll('label').forEach(l => {
+                if (l.onclick.toString().includes('true')) l.classList.add('correct');
+            });
+        }
+        question.querySelector('.explanation').style.display = 'block';
+
+        // Check if all questions in section answered
+        const allQuestions = question.closest('.quiz-section').querySelectorAll('.question');
+        const answered = question.closest('.quiz-section').querySelectorAll('.question[data-answered]');
+        if (allQuestions.length === answered.length) {
+            const scoreBox = question.closest('.quiz-section').querySelector('.score-box');
+            if (scoreBox) {
+                const s = scores[section];
+                const pct = Math.round((s.correct / s.total) * 100);
+                let emoji = pct >= 80 ? '🌟' : pct >= 60 ? '👍' : '💪';
+                scoreBox.innerHTML = `${emoji} Score: ${s.correct}/${s.total} (${pct}%)`;
+                scoreBox.style.display = 'block';
+            }
+            // Save quiz score
+            saveQuizScore(section, scores[section]);
+            // Unlock first-quiz badge
+            unlockBadge('badge-first');
+        }
+    }
+
+    // --- Progress Tracker ---
+    function getProgress() {
+        return JSON.parse(localStorage.getItem('aaden-progress') || '{}');
+    }
+    function saveProgress(data) {
+        localStorage.setItem('aaden-progress', JSON.stringify(data));
+    }
+    function getQuizScores() {
+        return JSON.parse(localStorage.getItem('aaden-scores') || '{}');
+    }
+    function saveQuizScore(quizId, score) {
+        const scores = getQuizScores();
+        scores[quizId] = score;
+        localStorage.setItem('aaden-scores', JSON.stringify(scores));
+    }
+
+    function toggleTask(el) {
+        const task = el.dataset.task;
+        const progress = getProgress();
+        const isDone = !progress[task];
+        progress[task] = isDone;
+        saveProgress(progress);
+        updateTaskUI(el, isDone);
+        updateProgressUI();
+    }
+
+    function updateTaskUI(el, isDone) {
+        const label = el.nextElementSibling;
+        if (isDone) {
+            el.classList.add('done');
+            label.classList.add('done-text');
+        } else {
+            el.classList.remove('done');
+            label.classList.remove('done-text');
+        }
+    }
+
+    function updateProgressUI() {
+        const progress = getProgress();
+        const checks = document.querySelectorAll('.tracker-check');
+        let done = 0;
+        const total = checks.length;
+
+        checks.forEach(el => {
+            const task = el.dataset.task;
+            if (progress[task]) {
+                el.classList.add('done');
+                el.nextElementSibling.classList.add('done-text');
+                done++;
+            } else {
+                el.classList.remove('done');
+                el.nextElementSibling.classList.remove('done-text');
+            }
+        });
+
+        const pct = total > 0 ? Math.round((done / total) * 100) : 0;
+        document.getElementById('overall-pct').textContent = pct + '%';
+        document.getElementById('overall-bar').style.width = pct + '%';
+        document.getElementById('home-progress-summary').textContent =
+            `${done}/${total} tasks complete (${pct}%)`;
+
+        // Check badges
+        checkBadges(progress);
+    }
+
+    function checkBadges(progress) {
+        const quizScores = getQuizScores();
+        if (Object.keys(quizScores).length > 0) unlockBadge('badge-first');
+
+        // ELA complete (weeks 1-4 ELA tasks)
+        if (progress['w1-ela-vocab'] && progress['w2-fireburn'] && progress['w3-vocabulary'] && progress['w4-inference'])
+            unlockBadge('badge-ela');
+        // Math complete
+        if (progress['w1-math-diag'] && progress['w2-integers'] && progress['w3-equations'] && progress['w4-proportions'])
+            unlockBadge('badge-math');
+        // Science complete
+        if (progress['w1-sci-diag'] && progress['w2-atoms'] && progress['w3-tectonics'])
+            unlockBadge('badge-science');
+        // Spelling
+        if (progress['w1-spelling1'] && progress['w2-spelling2'] && progress['w3-spelling3'] && progress['w4-spellingfinal'])
+            unlockBadge('badge-spelling');
+        // Master — all done
+        const checks = document.querySelectorAll('.tracker-check');
+        let allDone = true;
+        checks.forEach(el => { if (!progress[el.dataset.task]) allDone = false; });
+        if (allDone) unlockBadge('badge-master');
+    }
+
+    function unlockBadge(id) {
+        const badge = document.getElementById(id);
+        if (badge) {
+            badge.classList.remove('badge-locked');
+            badge.classList.add('badge-earned');
+        }
+        // Also persist
+        const badges = JSON.parse(localStorage.getItem('aaden-badges') || '[]');
+        if (!badges.includes(id)) { badges.push(id); localStorage.setItem('aaden-badges', JSON.stringify(badges)); }
+    }
+
+    function resetProgress() {
+        if (confirm('Are you sure? This will erase all your progress and scores.')) {
+            localStorage.removeItem('aaden-progress');
+            localStorage.removeItem('aaden-scores');
+            localStorage.removeItem('aaden-badges');
+            updateProgressUI();
+            // Reset badge UI
+            document.querySelectorAll('.badge').forEach(b => { b.classList.remove('badge-earned'); b.classList.add('badge-locked'); });
+        }
+    }
+
+    // Load saved state on page load
+    window.addEventListener('DOMContentLoaded', () => {
+        const progress = getProgress();
+        document.querySelectorAll('.tracker-check').forEach(el => {
+            if (progress[el.dataset.task]) {
+                el.classList.add('done');
+                el.nextElementSibling.classList.add('done-text');
+            }
+        });
+        // Restore badges
+        const badges = JSON.parse(localStorage.getItem('aaden-badges') || '[]');
+        badges.forEach(id => {
+            const badge = document.getElementById(id);
+            if (badge) { badge.classList.remove('badge-locked'); badge.classList.add('badge-earned'); }
+        });
+        // Update home summary
+        const checks = document.querySelectorAll('.tracker-check');
+        let done = 0;
+        checks.forEach(el => { if (progress[el.dataset.task]) done++; });
+        const pct = checks.length > 0 ? Math.round((done / checks.length) * 100) : 0;
+        document.getElementById('home-progress-summary').textContent =
+            `${done}/${checks.length} tasks complete (${pct}%)`;
+    });
+</script>
+</body>
+</html>

@@ -53,8 +53,9 @@
             transition: all 0.2s;
         }
         .question label:hover { border-color: #667eea; background: #f0f0ff; }
-        .question label.correct { border-color: #28a745; background: #d4edda; }
-        .question label.wrong { border-color: #dc3545; background: #f8d7da; }
+        .question label.correct { border-color: #28a745; background: #d4edda; pointer-events: none; }
+        .question label.wrong { border-color: #dc3545; background: #f8d7da; pointer-events: none; }
+        .question label.disabled { pointer-events: none; opacity: 0.7; }
         .explanation {
             display: none;
             background: #e8f5e9;
@@ -99,64 +100,30 @@
         .spelling-table th, .spelling-table td { padding: 10px; text-align: left; border-bottom: 1px solid #e0e0e0; }
         .spelling-table tr:hover { background: #f8f9fa; }
         .progress-bar-container {
-            background: #e0e0e0;
-            border-radius: 10px;
-            height: 20px;
-            margin: 10px 0;
-            overflow: hidden;
+            background: #e0e0e0; border-radius: 10px; height: 20px; margin: 10px 0; overflow: hidden;
         }
         .progress-bar-fill {
-            height: 100%;
-            border-radius: 10px;
+            height: 100%; border-radius: 10px;
             background: linear-gradient(90deg, #667eea, #764ba2);
             transition: width 0.5s ease;
         }
-        .tracker-item {
-            display: flex;
-            align-items: center;
-            padding: 12px 15px;
-            border-bottom: 1px solid #f0f0f0;
-            gap: 12px;
-        }
+        .tracker-item { display: flex; align-items: center; padding: 12px 15px; border-bottom: 1px solid #f0f0f0; gap: 12px; }
         .tracker-item:last-child { border-bottom: none; }
         .tracker-check {
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-            border: 2px solid #e0e0e0;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-            transition: all 0.2s;
+            width: 24px; height: 24px; border-radius: 50%; border: 2px solid #e0e0e0;
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0; transition: all 0.2s;
         }
-        .tracker-check.done {
-            background: #28a745;
-            border-color: #28a745;
-            color: white;
-        }
+        .tracker-check.done { background: #28a745; border-color: #28a745; color: white; }
         .tracker-label { flex: 1; }
         .tracker-label.done-text { text-decoration: line-through; color: #999; }
-        .badge {
-            display: inline-block;
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 0.8em;
-            font-weight: 600;
-            margin: 3px;
-        }
+        .badge { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 0.8em; font-weight: 600; margin: 3px; }
         .badge-locked { background: #e0e0e0; color: #999; }
         .badge-earned { background: #fff3cd; color: #856404; }
-        .week-header {
-            font-weight: 700;
-            font-size: 1.1em;
-            margin: 20px 0 8px;
-            padding-left: 5px;
-            color: #667eea;
-        }
+        .week-header { font-weight: 700; font-size: 1.1em; margin: 20px 0 8px; padding-left: 5px; color: #667eea; }
         .overall-progress { text-align: center; margin-bottom: 20px; }
         .overall-progress .pct { font-size: 2em; font-weight: 700; color: #667eea; }
+        .quiz-progress { text-align: center; color: #666; margin-bottom: 15px; font-size: 0.95em; }
         @media (max-width: 600px) {
             .container { padding: 20px 15px; }
             h1 { font-size: 1.5em; }
@@ -169,22 +136,25 @@
     <div id="home" class="quiz-section active">
         <h1>📚 Aaden's Study Guide</h1>
         <p class="subtitle">6th → 7th Grade Summer Bridge</p>
-
-        <div class="subject-card" onclick="showSection('ela-menu')">
+        <div class="subject-card" onclick="startQuiz('ela')">
             <h2>📖 English Language Arts</h2>
-            <p>Synonyms, antonyms, spelling, reading passages & hidden meanings</p>
+            <p>20 random questions from a pool of 60 — synonyms, antonyms, context, inference</p>
         </div>
-        <div class="subject-card" onclick="showSection('math')">
+        <div class="subject-card" onclick="startQuiz('math')">
             <h2>🧮 Mathematics</h2>
-            <p>Fractions, decimals, ratios, integers, equations & proportions</p>
+            <p>20 random questions from a pool of 60 — fractions, integers, equations, proportions</p>
         </div>
-        <div class="subject-card" onclick="showSection('science')">
+        <div class="subject-card" onclick="startQuiz('science')">
             <h2>🔬 Science</h2>
-            <p>Cell biology, ecosystems, earth science, chemistry & physics</p>
+            <p>20 random questions from a pool of 60 — cells, chemistry, earth science, physics</p>
         </div>
-        <div class="subject-card" onclick="showSection('spelling')">
-            <h2>✍️ Spelling Challenge</h2>
+        <div class="subject-card" onclick="showSection('words')">
+            <h2>📝 Words You Should Know</h2>
             <p>Top 20 tricky 7th-grade words with memory tricks</p>
+        </div>
+        <div class="subject-card" onclick="showSection('spelling-test')">
+            <h2>✍️ Spelling Test</h2>
+            <p>Hear the word, type it correctly — just like a real spelling bee!</p>
         </div>
         <div class="subject-card" onclick="showSection('progress')" style="border-color: #667eea; background: #f8f9ff;">
             <h2>📊 My Progress</h2>
@@ -192,224 +162,22 @@
         </div>
     </div>
 
-    <!-- ELA MENU -->
-    <div id="ela-menu" class="quiz-section">
-        <h1>📖 English Language Arts</h1>
-        <p class="subtitle">Choose a quiz:</p>
-        <div class="subject-card" onclick="showSection('ela-vocab')">
-            <h2>Part A: Synonyms, Antonyms & Context</h2>
-            <p>4 questions testing word relationships</p>
-        </div>
-        <div class="subject-card" onclick="showSection('ela-reading')">
-            <h2>Part B: The Fireburn of Frederiksted</h2>
-            <p>USVI history reading passage with inference questions</p>
-        </div>
+    <!-- DYNAMIC QUIZ CONTAINER -->
+    <div id="quiz-container" class="quiz-section">
+        <h1 id="quiz-title"></h1>
+        <div class="quiz-progress" id="quiz-progress-text"></div>
+        <div id="quiz-questions"></div>
+        <div class="score-box" id="quiz-score" style="display:none"></div>
         <br>
+        <button class="btn" id="quiz-next-btn" style="display:none" onclick="showNextBatch()">Next Questions →</button>
+        <button class="btn" id="quiz-retry-btn" style="display:none" onclick="retryQuiz()">🔄 New Set of 20</button>
         <button class="btn btn-back" onclick="showSection('home')">← Back</button>
     </div>
 
-    <!-- ELA VOCAB QUIZ -->
-    <div id="ela-vocab" class="quiz-section">
-        <h1>📖 Synonyms, Antonyms & Context</h1>
-        <div class="question" id="eq1">
-            <p>1. "The sailor was cautious as the storm approached St. Thomas." Which word means the same as <em>cautious</em>?</p>
-            <label onclick="checkAnswer(this, true, 'eq1')"><input type="radio" name="eq1"> B) Careful</label>
-            <label onclick="checkAnswer(this, false, 'eq1')"><input type="radio" name="eq1"> A) Brave</label>
-            <label onclick="checkAnswer(this, false, 'eq1')"><input type="radio" name="eq1"> C) Terrified</label>
-            <div class="explanation">✅ Cautious means taking extra care to avoid danger or mistakes.</div>
-        </div>
-        <div class="question" id="eq2">
-            <p>2. What is the exact opposite of the word <em>permanent</em>?</p>
-            <label onclick="checkAnswer(this, false, 'eq2')"><input type="radio" name="eq2"> A) Lasting</label>
-            <label onclick="checkAnswer(this, true, 'eq2')"><input type="radio" name="eq2"> B) Temporary</label>
-            <label onclick="checkAnswer(this, false, 'eq2')"><input type="radio" name="eq2"> C) Broken</label>
-            <div class="explanation">✅ Permanent means lasting forever; temporary means lasting for only a limited time.</div>
-        </div>
-        <div class="question" id="eq3">
-            <p>3. "The structural damage to the old dock was immense, requiring months of intense labor to repair." <em>Immense</em> means:</p>
-            <label onclick="checkAnswer(this, false, 'eq3')"><input type="radio" name="eq3"> A) Tiny</label>
-            <label onclick="checkAnswer(this, false, 'eq3')"><input type="radio" name="eq3"> B) Standard</label>
-            <label onclick="checkAnswer(this, true, 'eq3')"><input type="radio" name="eq3"> C) Massive</label>
-            <div class="explanation">✅ The clue is "months of intense labor," which indicates the damage was incredibly large.</div>
-        </div>
-        <div class="question" id="eq4">
-            <p>4. Choose the sentence with the correct spelling:</p>
-            <label onclick="checkAnswer(this, false, 'eq4')"><input type="radio" name="eq4"> A) Their going to the beach after school.</label>
-            <label onclick="checkAnswer(this, false, 'eq4')"><input type="radio" name="eq4"> B) There going to the beach after school.</label>
-            <label onclick="checkAnswer(this, true, 'eq4')"><input type="radio" name="eq4"> C) They're going to the beach after school.</label>
-            <div class="explanation">✅ "They're" is short for "they are." "There" is a place. "Their" shows ownership.</div>
-        </div>
-        <div class="score-box" id="ela-vocab-score" style="display:none"></div>
-        <br>
-        <button class="btn btn-back" onclick="showSection('ela-menu')">← Back</button>
-    </div>
-
-    <!-- ELA READING -->
-    <div id="ela-reading" class="quiz-section">
-        <h1>📖 The Fireburn of Frederiksted</h1>
-        <p class="subtitle">Read carefully, then answer the questions below.</p>
-        <div class="passage">
-            In October 1878, thirty years after slavery was abolished in the Danish West Indies, the air in St. Croix grew thick with a different kind of heat. Freedom had arrived on paper, but the laborers on the sugar plantations still found themselves locked in invisible chains—bound by laws that forced them into low-paying, multi-year contracts with no right to leave their estates.<br><br>
-            Then, a woman named Mary Thomas stepped into the light. Known to history as "Queen Mary," she did not carry official power or military weapons. Instead, she carried a torch and a fierce determination. Alongside other labor leaders, she marched. When the sugar cane fields burned that night, the smoke that filled the Caribbean sky wasn't just a sign of destruction; it was a loud, unavoidable message written in ash that the old ways could no longer stand.
-        </div>
-        <div class="question" id="rq1">
-            <p>1. The author writes the laborers were "locked in invisible chains." What does this phrase really mean?</p>
-            <label onclick="checkAnswer(this, false, 'rq1')"><input type="radio" name="rq1"> A) The laborers were wearing magic, see-through handcuffs.</label>
-            <label onclick="checkAnswer(this, true, 'rq1')"><input type="radio" name="rq1"> B) Even though slavery was over, unfair laws still kept the workers trapped and powerless.</label>
-            <label onclick="checkAnswer(this, false, 'rq1')"><input type="radio" name="rq1"> C) The plantation owners forgot to unlock the gates to the fields.</label>
-            <div class="explanation">✅ The "chains" are a <strong>metaphor</strong> for unfair economic rules that restricted freedom.</div>
-        </div>
-        <div class="question" id="rq2">
-            <p>2. In the passage, the word <em>abolished</em> means:</p>
-            <label onclick="checkAnswer(this, false, 'rq2')"><input type="radio" name="rq2"> A) Expanded or made larger.</label>
-            <label onclick="checkAnswer(this, false, 'rq2')"><input type="radio" name="rq2"> B) Forgotten or misplaced.</label>
-            <label onclick="checkAnswer(this, true, 'rq2')"><input type="radio" name="rq2"> C) Ended or officially done away with.</label>
-            <div class="explanation">✅ To abolish something means to formally and completely end it.</div>
-        </div>
-        <div class="question" id="rq3">
-            <p>3. The smoke was "a loud, unavoidable message written in ash." What is the hidden meaning?</p>
-            <label onclick="checkAnswer(this, false, 'rq3')"><input type="radio" name="rq3"> A) The workers were trying to use smoke signals to talk to other islands.</label>
-            <label onclick="checkAnswer(this, true, 'rq3')"><input type="radio" name="rq3"> B) The fire was a powerful protest that forced the government to notice their suffering.</label>
-            <label onclick="checkAnswer(this, false, 'rq3')"><input type="radio" name="rq3"> C) The fire accidentally got out of hand because it was a windy night.</label>
-            <div class="explanation">✅ The ash and smoke represent making invisible problems visible to the entire island.</div>
-        </div>
-        <div class="score-box" id="ela-reading-score" style="display:none"></div>
-        <br>
-        <button class="btn btn-back" onclick="showSection('ela-menu')">← Back</button>
-    </div>
-
-    <!-- MATH QUIZ -->
-    <div id="math" class="quiz-section">
-        <h1>🧮 Math Diagnostic Quiz</h1>
-        <div class="question" id="mq1">
-            <p>1. (6th Grade) What is 3/4 ÷ 1/2?</p>
-            <label onclick="checkAnswer(this, false, 'mq1')"><input type="radio" name="mq1"> A) 3/8</label>
-            <label onclick="checkAnswer(this, true, 'mq1')"><input type="radio" name="mq1"> B) 3/2 (or 1½)</label>
-            <label onclick="checkAnswer(this, false, 'mq1')"><input type="radio" name="mq1"> C) 1/4</label>
-            <div class="explanation">✅ Keep, Change, Flip: 3/4 × 2/1 = 6/4 = 3/2</div>
-        </div>
-        <div class="question" id="mq2">
-            <p>2. (6th Grade) Solve 1.25 × 4</p>
-            <label onclick="checkAnswer(this, false, 'mq2')"><input type="radio" name="mq2"> A) 4.25</label>
-            <label onclick="checkAnswer(this, true, 'mq2')"><input type="radio" name="mq2"> B) 5</label>
-            <label onclick="checkAnswer(this, false, 'mq2')"><input type="radio" name="mq2"> C) 5.25</label>
-            <div class="explanation">✅ 125 × 4 = 500, then place the decimal: 5.00 = 5</div>
-        </div>
-        <div class="question" id="mq3">
-            <p>3. (6th Grade) A recipe uses 2 cups of sugar for 5 cups of flour. What is the ratio of sugar to flour?</p>
-            <label onclick="checkAnswer(this, true, 'mq3')"><input type="radio" name="mq3"> A) 2:5</label>
-            <label onclick="checkAnswer(this, false, 'mq3')"><input type="radio" name="mq3"> B) 5:2</label>
-            <label onclick="checkAnswer(this, false, 'mq3')"><input type="radio" name="mq3"> C) 2:7</label>
-            <div class="explanation">✅ Ratios compare quantities in the order they are asked: sugar TO flour = 2:5</div>
-        </div>
-        <div class="question" id="mq4">
-            <p>4. (6th Grade) Simplify: 3(x + 4)</p>
-            <label onclick="checkAnswer(this, false, 'mq4')"><input type="radio" name="mq4"> A) 3x + 4</label>
-            <label onclick="checkAnswer(this, true, 'mq4')"><input type="radio" name="mq4"> B) 3x + 12</label>
-            <label onclick="checkAnswer(this, false, 'mq4')"><input type="radio" name="mq4"> C) 7x</label>
-            <div class="explanation">✅ Distributive property: multiply 3 by both x AND 4.</div>
-        </div>
-        <div class="question" id="mq5">
-            <p>5. (7th Grade) Solve: -3 + (-5)</p>
-            <label onclick="checkAnswer(this, true, 'mq5')"><input type="radio" name="mq5"> A) -8</label>
-            <label onclick="checkAnswer(this, false, 'mq5')"><input type="radio" name="mq5"> B) -2</label>
-            <label onclick="checkAnswer(this, false, 'mq5')"><input type="radio" name="mq5"> C) 8</label>
-            <div class="explanation">✅ Adding a negative = moving further left on the number line: -3 + (-5) = -8</div>
-        </div>
-        <div class="question" id="mq6">
-            <p>6. (7th Grade) If 2x + 5 = 13, what is x?</p>
-            <label onclick="checkAnswer(this, false, 'mq6')"><input type="radio" name="mq6"> A) 9</label>
-            <label onclick="checkAnswer(this, true, 'mq6')"><input type="radio" name="mq6"> B) 4</label>
-            <label onclick="checkAnswer(this, false, 'mq6')"><input type="radio" name="mq6"> C) 6</label>
-            <div class="explanation">✅ Subtract 5 from both sides: 2x = 8. Divide by 2: x = 4.</div>
-        </div>
-        <div class="question" id="mq7">
-            <p>7. (7th Grade) If 3 notebooks cost $6, how much do 7 notebooks cost?</p>
-            <label onclick="checkAnswer(this, false, 'mq7')"><input type="radio" name="mq7"> A) $12</label>
-            <label onclick="checkAnswer(this, true, 'mq7')"><input type="radio" name="mq7"> B) $14</label>
-            <label onclick="checkAnswer(this, false, 'mq7')"><input type="radio" name="mq7"> C) $21</label>
-            <div class="explanation">✅ Unit rate: $6 ÷ 3 = $2 each. Then $2 × 7 = $14.</div>
-        </div>
-        <div class="question" id="mq8">
-            <p>8. (7th Grade) A ferry travels 15 miles in 30 minutes. What is its speed per hour?</p>
-            <label onclick="checkAnswer(this, false, 'mq8')"><input type="radio" name="mq8"> A) 15 mph</label>
-            <label onclick="checkAnswer(this, true, 'mq8')"><input type="radio" name="mq8"> B) 30 mph</label>
-            <label onclick="checkAnswer(this, false, 'mq8')"><input type="radio" name="mq8"> C) 45 mph</label>
-            <div class="explanation">✅ Double the 30-minute distance: 15 × 2 = 30 miles per hour.</div>
-        </div>
-        <div class="score-box" id="math-score" style="display:none"></div>
-        <br>
-        <button class="btn btn-back" onclick="showSection('home')">← Back</button>
-    </div>
-
-    <!-- SCIENCE QUIZ -->
-    <div id="science" class="quiz-section">
-        <h1>🔬 Science Diagnostic Quiz</h1>
-        <div class="question" id="sq1">
-            <p>1. (6th Grade) What organelle is known as the "powerhouse" of the cell?</p>
-            <label onclick="checkAnswer(this, true, 'sq1')"><input type="radio" name="sq1"> A) Mitochondria</label>
-            <label onclick="checkAnswer(this, false, 'sq1')"><input type="radio" name="sq1"> B) Nucleus</label>
-            <label onclick="checkAnswer(this, false, 'sq1')"><input type="radio" name="sq1"> C) Ribosome</label>
-            <div class="explanation">✅ The mitochondria generates the cell's chemical energy (ATP).</div>
-        </div>
-        <div class="question" id="sq2">
-            <p>2. (6th Grade) What is the primary source of energy for most ecosystems on Earth?</p>
-            <label onclick="checkAnswer(this, false, 'sq2')"><input type="radio" name="sq2"> A) Water</label>
-            <label onclick="checkAnswer(this, true, 'sq2')"><input type="radio" name="sq2"> B) The Sun</label>
-            <label onclick="checkAnswer(this, false, 'sq2')"><input type="radio" name="sq2"> C) Soil</label>
-            <div class="explanation">✅ The Sun provides radiation that plants use in photosynthesis, starting the food chain.</div>
-        </div>
-        <div class="question" id="sq3">
-            <p>3. (6th Grade) Name the three primary layers of the Earth:</p>
-            <label onclick="checkAnswer(this, true, 'sq3')"><input type="radio" name="sq3"> A) Crust, mantle, and core</label>
-            <label onclick="checkAnswer(this, false, 'sq3')"><input type="radio" name="sq3"> B) Surface, middle, and center</label>
-            <label onclick="checkAnswer(this, false, 'sq3')"><input type="radio" name="sq3"> C) Rock, magma, and iron</label>
-            <div class="explanation">✅ The three structural layers are the crust (outer), mantle (middle), and core (inner).</div>
-        </div>
-        <div class="question" id="sq4">
-            <p>4. (6th Grade) Water turning from a liquid into a gas is called:</p>
-            <label onclick="checkAnswer(this, false, 'sq4')"><input type="radio" name="sq4"> A) Condensation</label>
-            <label onclick="checkAnswer(this, true, 'sq4')"><input type="radio" name="sq4"> B) Evaporation</label>
-            <label onclick="checkAnswer(this, false, 'sq4')"><input type="radio" name="sq4"> C) Precipitation</label>
-            <div class="explanation">✅ Evaporation is the phase change from liquid to gas.</div>
-        </div>
-        <div class="question" id="sq5">
-            <p>5. (7th Grade) What is the difference between an atom and a molecule?</p>
-            <label onclick="checkAnswer(this, false, 'sq5')"><input type="radio" name="sq5"> A) They are the same thing</label>
-            <label onclick="checkAnswer(this, true, 'sq5')"><input type="radio" name="sq5"> B) An atom is a single building block; a molecule is two or more atoms bonded together</label>
-            <label onclick="checkAnswer(this, false, 'sq5')"><input type="radio" name="sq5"> C) A molecule is smaller than an atom</label>
-            <div class="explanation">✅ Atoms are individual elements. When atoms bond together, they form molecules.</div>
-        </div>
-        <div class="question" id="sq6">
-            <p>6. (7th Grade) What happens at a convergent plate boundary?</p>
-            <label onclick="checkAnswer(this, true, 'sq6')"><input type="radio" name="sq6"> A) Mountains form, or earthquakes and volcanoes occur</label>
-            <label onclick="checkAnswer(this, false, 'sq6')"><input type="radio" name="sq6"> B) Plates slide past each other smoothly</label>
-            <label onclick="checkAnswer(this, false, 'sq6')"><input type="radio" name="sq6"> C) New ocean floor is created</label>
-            <div class="explanation">✅ Convergent = plates colliding, pushing land up into mountains or causing quakes.</div>
-        </div>
-        <div class="question" id="sq7">
-            <p>7. (7th Grade) What happens to water molecules when liquid water boils into steam?</p>
-            <label onclick="checkAnswer(this, true, 'sq7')"><input type="radio" name="sq7"> A) They speed up and spread further apart</label>
-            <label onclick="checkAnswer(this, false, 'sq7')"><input type="radio" name="sq7"> B) They slow down and stick together</label>
-            <label onclick="checkAnswer(this, false, 'sq7')"><input type="radio" name="sq7"> C) They disappear completely</label>
-            <div class="explanation">✅ Heat energy makes molecules move faster, breaking bonds and spreading apart.</div>
-        </div>
-        <div class="question" id="sq8">
-            <p>8. (7th Grade) Plants use sunlight, water, and CO₂ to make food. This process is called:</p>
-            <label onclick="checkAnswer(this, false, 'sq8')"><input type="radio" name="sq8"> A) Respiration</label>
-            <label onclick="checkAnswer(this, true, 'sq8')"><input type="radio" name="sq8"> B) Photosynthesis</label>
-            <label onclick="checkAnswer(this, false, 'sq8')"><input type="radio" name="sq8"> C) Fermentation</label>
-            <div class="explanation">✅ Photo (light) + synthesis (making) = making food from light.</div>
-        </div>
-        <div class="score-box" id="science-score" style="display:none"></div>
-        <br>
-        <button class="btn btn-back" onclick="showSection('home')">← Back</button>
-    </div>
-
-    <!-- SPELLING -->
-    <div id="spelling" class="quiz-section">
-        <h1>✍️ Spelling Challenge</h1>
-        <p class="subtitle">Top 20 tricky words for 7th grade. Study the traps!</p>
+    <!-- WORDS YOU SHOULD KNOW -->
+    <div id="words" class="quiz-section">
+        <h1>📝 Words You Should Know</h1>
+        <p class="subtitle">Study these 20 tricky words and their traps before taking the spelling test.</p>
         <table class="spelling-table">
             <tr><th>#</th><th>Word</th><th>Trap / Memory Trick</th></tr>
             <tr><td>1</td><td><strong>Caribbean</strong></td><td>One 'r', double 'b'</td></tr>
@@ -434,6 +202,40 @@
             <tr><td>20</td><td><strong>Government</strong></td><td>Don't drop the 'n' people skip</td></tr>
         </table>
         <br>
+        <button class="btn" onclick="showSection('spelling-test')">Take the Spelling Test →</button>
+        <button class="btn btn-back" onclick="showSection('home')">← Back</button>
+    </div>
+
+    <!-- SPELLING TEST -->
+    <div id="spelling-test" class="quiz-section">
+        <h1>✍️ Spelling Test</h1>
+        <p class="subtitle">Click 🔊 to hear the word, then type it correctly.</p>
+        <div id="spell-test-area">
+            <div style="text-align:center; margin: 20px 0;">
+                <span style="font-size: 1.2em; font-weight: 600;" id="spell-word-num">Word 1 of 20</span>
+            </div>
+            <div style="text-align:center; margin: 15px 0;">
+                <button class="btn" onclick="speakCurrentWord()" style="font-size: 1.2em; padding: 15px 30px;">🔊 Hear the Word</button>
+            </div>
+            <div style="text-align:center; margin: 10px 0; color: #666; font-style: italic;" id="spell-hint"></div>
+            <div style="text-align:center; margin: 20px 0;">
+                <input type="text" id="spell-input" placeholder="Type the word here..."
+                    style="font-size: 1.2em; padding: 12px 20px; border: 2px solid #e0e0e0; border-radius: 8px; width: 80%; max-width: 350px; text-align: center;"
+                    onkeydown="if(event.key==='Enter')checkSpelling()" autocomplete="off" autocorrect="off" spellcheck="false">
+            </div>
+            <div style="text-align:center;">
+                <button class="btn" onclick="checkSpelling()">Submit</button>
+                <button class="btn btn-back" onclick="skipWord()">Skip</button>
+            </div>
+            <div id="spell-feedback" style="text-align:center; margin-top: 15px; font-size: 1.1em; min-height: 30px;"></div>
+        </div>
+        <div id="spell-results" style="display:none;">
+            <div class="score-box" id="spell-score-box"></div>
+            <div id="spell-review" style="margin-top: 20px;"></div>
+            <br>
+            <button class="btn" onclick="startSpellingTest()">🔄 Try Again</button>
+        </div>
+        <br>
         <button class="btn btn-back" onclick="showSection('home')">← Back</button>
     </div>
 
@@ -447,31 +249,26 @@
                 <div class="progress-bar-fill" id="overall-bar" style="width: 0%"></div>
             </div>
         </div>
-
         <div class="week-header">📅 Week 1: Foundation Review</div>
-        <div class="tracker-item"><div class="tracker-check" onclick="toggleTask(this)" data-task="w1-ela-vocab">✓</div><span class="tracker-label">Complete ELA Synonyms & Antonyms Quiz</span></div>
-        <div class="tracker-item"><div class="tracker-check" onclick="toggleTask(this)" data-task="w1-math-diag">✓</div><span class="tracker-label">Complete Math Diagnostic Quiz</span></div>
-        <div class="tracker-item"><div class="tracker-check" onclick="toggleTask(this)" data-task="w1-sci-diag">✓</div><span class="tracker-label">Complete Science Diagnostic Quiz</span></div>
-        <div class="tracker-item"><div class="tracker-check" onclick="toggleTask(this)" data-task="w1-spelling1">✓</div><span class="tracker-label">Study Spelling List (Round 1)</span></div>
-
+        <div class="tracker-item"><div class="tracker-check" onclick="toggleTask(this)" data-task="w1-ela-vocab">✓</div><span class="tracker-label">Complete ELA Quiz (score 70%+)</span></div>
+        <div class="tracker-item"><div class="tracker-check" onclick="toggleTask(this)" data-task="w1-math-diag">✓</div><span class="tracker-label">Complete Math Quiz (score 70%+)</span></div>
+        <div class="tracker-item"><div class="tracker-check" onclick="toggleTask(this)" data-task="w1-sci-diag">✓</div><span class="tracker-label">Complete Science Quiz (score 70%+)</span></div>
+        <div class="tracker-item"><div class="tracker-check" onclick="toggleTask(this)" data-task="w1-spelling1">✓</div><span class="tracker-label">Study Words You Should Know list</span></div>
         <div class="week-header">📅 Week 2: Deep Dive</div>
-        <div class="tracker-item"><div class="tracker-check" onclick="toggleTask(this)" data-task="w2-fireburn">✓</div><span class="tracker-label">Read Fireburn passage & answer inference questions</span></div>
-        <div class="tracker-item"><div class="tracker-check" onclick="toggleTask(this)" data-task="w2-integers">✓</div><span class="tracker-label">Complete Integers Lesson + Practice</span></div>
-        <div class="tracker-item"><div class="tracker-check" onclick="toggleTask(this)" data-task="w2-atoms">✓</div><span class="tracker-label">Complete Atoms & Molecules Lesson</span></div>
-        <div class="tracker-item"><div class="tracker-check" onclick="toggleTask(this)" data-task="w2-spelling2">✓</div><span class="tracker-label">Study Spelling List (Round 2)</span></div>
-
+        <div class="tracker-item"><div class="tracker-check" onclick="toggleTask(this)" data-task="w2-fireburn">✓</div><span class="tracker-label">Score 80%+ on ELA Quiz</span></div>
+        <div class="tracker-item"><div class="tracker-check" onclick="toggleTask(this)" data-task="w2-integers">✓</div><span class="tracker-label">Score 80%+ on Math Quiz</span></div>
+        <div class="tracker-item"><div class="tracker-check" onclick="toggleTask(this)" data-task="w2-atoms">✓</div><span class="tracker-label">Score 80%+ on Science Quiz</span></div>
+        <div class="tracker-item"><div class="tracker-check" onclick="toggleTask(this)" data-task="w2-spelling2">✓</div><span class="tracker-label">Spelling Test: score 14+ out of 20</span></div>
         <div class="week-header">📅 Week 3: Level Up</div>
-        <div class="tracker-item"><div class="tracker-check" onclick="toggleTask(this)" data-task="w3-vocabulary">✓</div><span class="tracker-label">Complete Vocabulary Power Lesson</span></div>
-        <div class="tracker-item"><div class="tracker-check" onclick="toggleTask(this)" data-task="w3-equations">✓</div><span class="tracker-label">Complete Equations Lesson + Practice</span></div>
-        <div class="tracker-item"><div class="tracker-check" onclick="toggleTask(this)" data-task="w3-tectonics">✓</div><span class="tracker-label">Complete Plate Tectonics Lesson</span></div>
-        <div class="tracker-item"><div class="tracker-check" onclick="toggleTask(this)" data-task="w3-spelling3">✓</div><span class="tracker-label">Study Spelling List (Round 3)</span></div>
-
+        <div class="tracker-item"><div class="tracker-check" onclick="toggleTask(this)" data-task="w3-vocabulary">✓</div><span class="tracker-label">Score 90%+ on ELA Quiz</span></div>
+        <div class="tracker-item"><div class="tracker-check" onclick="toggleTask(this)" data-task="w3-equations">✓</div><span class="tracker-label">Score 90%+ on Math Quiz</span></div>
+        <div class="tracker-item"><div class="tracker-check" onclick="toggleTask(this)" data-task="w3-tectonics">✓</div><span class="tracker-label">Score 90%+ on Science Quiz</span></div>
+        <div class="tracker-item"><div class="tracker-check" onclick="toggleTask(this)" data-task="w3-spelling3">✓</div><span class="tracker-label">Spelling Test: score 17+ out of 20</span></div>
         <div class="week-header">📅 Week 4: Mastery</div>
-        <div class="tracker-item"><div class="tracker-check" onclick="toggleTask(this)" data-task="w4-inference">✓</div><span class="tracker-label">Complete Inference & Hidden Meanings Lesson</span></div>
-        <div class="tracker-item"><div class="tracker-check" onclick="toggleTask(this)" data-task="w4-proportions">✓</div><span class="tracker-label">Complete Proportions & Unit Rates Lesson</span></div>
-        <div class="tracker-item"><div class="tracker-check" onclick="toggleTask(this)" data-task="w4-retake">✓</div><span class="tracker-label">Retake all quizzes — beat your first score!</span></div>
-        <div class="tracker-item"><div class="tracker-check" onclick="toggleTask(this)" data-task="w4-spellingfinal">✓</div><span class="tracker-label">Spelling Test: all 20 words from memory</span></div>
-
+        <div class="tracker-item"><div class="tracker-check" onclick="toggleTask(this)" data-task="w4-inference">✓</div><span class="tracker-label">Score 95%+ on all three quizzes</span></div>
+        <div class="tracker-item"><div class="tracker-check" onclick="toggleTask(this)" data-task="w4-proportions">✓</div><span class="tracker-label">Perfect 20/20 Spelling Test</span></div>
+        <div class="tracker-item"><div class="tracker-check" onclick="toggleTask(this)" data-task="w4-retake">✓</div><span class="tracker-label">Complete 3 quizzes in a row (any subject)</span></div>
+        <div class="tracker-item"><div class="tracker-check" onclick="toggleTask(this)" data-task="w4-spellingfinal">✓</div><span class="tracker-label">Teach someone else 5 things you learned</span></div>
         <div class="week-header">🏆 Achievements</div>
         <div id="badges">
             <span class="badge badge-locked" id="badge-first">🏅 First Quiz</span>
@@ -488,187 +285,450 @@
 </div>
 
 <script>
-    let scores = {};
+// ========== QUESTION BANKS (60 per subject) ==========
+const questionBanks = {
+ela: [
+    {q:"\"The sailor was cautious as the storm approached.\" Which word means the same as <em>cautious</em>?", a:["Careful","Brave","Terrified"], c:0, e:"Cautious means taking extra care to avoid danger."},
+    {q:"What is the exact opposite of <em>permanent</em>?", a:["Temporary","Lasting","Broken"], c:0, e:"Permanent = forever; temporary = for a limited time."},
+    {q:"\"The damage to the dock was immense, requiring months of labor.\" <em>Immense</em> means:", a:["Massive","Tiny","Standard"], c:0, e:"'Months of intense labor' = the damage was huge."},
+    {q:"Choose the sentence with correct spelling:", a:["They're going to the beach.","Their going to the beach.","There going to the beach."], c:0, e:"They're = they are. Their = ownership. There = a place."},
+    {q:"What is the exact opposite of <em>ancient</em>?", a:["Modern","Old","Classic"], c:0, e:"Ancient means extremely old; modern means current/new."},
+    {q:"\"The resilient community rebuilt after the hurricane.\" <em>Resilient</em> means:", a:["Able to recover from hardship","Weak and tired","Rich and powerful"], c:0, e:"Resilient = bouncing back from difficulty."},
+    {q:"Which word is a synonym for <em>enormous</em>?", a:["Vast","Tiny","Average"], c:0, e:"Enormous, vast, immense, massive all mean very large."},
+    {q:"What is the antonym of <em>generous</em>?", a:["Selfish","Kind","Wealthy"], c:0, e:"Generous = giving freely; selfish = only thinking of yourself."},
+    {q:"\"She was elated when she won.\" <em>Elated</em> means:", a:["Extremely happy","Very sad","Confused"], c:0, e:"Elated = thrilled, overjoyed, ecstatic."},
+    {q:"What is the antonym of <em>expand</em>?", a:["Contract","Grow","Stretch"], c:0, e:"Expand = get bigger; contract = get smaller."},
+    {q:"\"The teacher's instructions were ambiguous.\" <em>Ambiguous</em> means:", a:["Unclear, could mean multiple things","Very loud","Extremely detailed"], c:0, e:"Ambiguous = having more than one possible meaning."},
+    {q:"Which word is a synonym for <em>terrified</em>?", a:["Petrified","Excited","Bored"], c:0, e:"Terrified, petrified, frightened all mean very scared."},
+    {q:"What is the antonym of <em>voluntary</em>?", a:["Mandatory","Optional","Easy"], c:0, e:"Voluntary = by choice; mandatory = required."},
+    {q:"\"The abundant rainfall helped crops grow.\" <em>Abundant</em> means:", a:["Plentiful, more than enough","Scarce","Dangerous"], c:0, e:"Abundant = existing in large quantities."},
+    {q:"Which prefix makes <em>possible</em> mean the opposite?", a:["im- (impossible)","re- (repossible)","un- (unpossible)"], c:0, e:"Impossible = not possible. 'Im-' negates words starting with p/b/m."},
+    {q:"\"He tried to conceal his disappointment.\" <em>Conceal</em> means:", a:["Hide","Show","Increase"], c:0, e:"Conceal = to hide or keep secret."},
+    {q:"What is the antonym of <em>transparent</em>?", a:["Opaque","Clear","Invisible"], c:0, e:"Transparent = see-through; opaque = cannot see through."},
+    {q:"\"The laborers were locked in invisible chains.\" This is an example of:", a:["Metaphor","Simile","Alliteration"], c:0, e:"A metaphor compares without using 'like' or 'as'."},
+    {q:"\"She ran like the wind.\" This is an example of:", a:["Simile","Metaphor","Personification"], c:0, e:"A simile uses 'like' or 'as' to compare two things."},
+    {q:"\"The wind whispered through the trees.\" This is an example of:", a:["Personification","Simile","Metaphor"], c:0, e:"Personification gives human qualities to non-human things."},
+    {q:"What does the root word <em>bio</em> mean?", a:["Life","Earth","Write"], c:0, e:"Bio = life (biology, biography, biome)."},
+    {q:"What does the root word <em>geo</em> mean?", a:["Earth","Water","Fire"], c:0, e:"Geo = earth (geography, geology, geometry)."},
+    {q:"What does the root word <em>aqua</em> mean?", a:["Water","Air","Land"], c:0, e:"Aqua = water (aquarium, aquatic, aqueduct)."},
+    {q:"What does the root word <em>therm</em> mean?", a:["Heat","Cold","Light"], c:0, e:"Therm = heat (thermometer, thermal, thermos)."},
+    {q:"What does the root word <em>rupt</em> mean?", a:["Break","Build","Run"], c:0, e:"Rupt = break (erupt, interrupt, rupture)."},
+    {q:"\"After the hurricane, neighbors who never spoke helped each other.\" The hidden meaning is:", a:["Crisis brings people together","Hurricanes are fun","Neighbors are always friendly"], c:0, e:"The contrast shows that hard times change people's behavior."},
+    {q:"An author describes a character's \"tight roots gripping the earth\" after a storm. This symbolizes:", a:["Inner strength despite outward damage","Gardening tips","Fear of wind"], c:0, e:"Roots = internal strength; storm damage = external struggles."},
+    {q:"\"Freedom had arrived on paper.\" This means:", a:["Laws changed but real life didn't improve","Someone wrote a letter about freedom","A newspaper reported good news"], c:0, e:"'On paper' = officially/legally, but not in practice."},
+    {q:"What is the antonym of <em>artificial</em>?", a:["Natural","Fake","Expensive"], c:0, e:"Artificial = man-made; natural = from nature."},
+    {q:"\"The expedition was arduous.\" <em>Arduous</em> means:", a:["Extremely difficult","Easy and fun","Short"], c:0, e:"Arduous = requiring great effort, strenuous."},
+    {q:"Which word is a synonym for <em>cautious</em>?", a:["Wary","Reckless","Fast"], c:0, e:"Cautious, wary, careful all mean taking care to avoid danger."},
+    {q:"What is the antonym of <em>triumph</em>?", a:["Defeat","Victory","Celebration"], c:0, e:"Triumph = great victory; defeat = loss."},
+    {q:"\"The frigid water made him gasp.\" <em>Frigid</em> means:", a:["Extremely cold","Warm","Salty"], c:0, e:"Frigid = intensely cold, freezing."},
+    {q:"Which word means \"happening every year\"?", a:["Annual","Daily","Monthly"], c:0, e:"Annual = once per year (anniversary, annual report)."},
+    {q:"\"She gave a brief summary.\" <em>Brief</em> means:", a:["Short","Long","Confusing"], c:0, e:"Brief = short in duration or length."},
+    {q:"What does <em>subterranean</em> mean? (sub = under, terra = earth)", a:["Underground","Underwater","Above ground"], c:0, e:"Sub (under) + terra (earth) = underground."},
+    {q:"\"His apathy toward school worried his parents.\" <em>Apathy</em> means:", a:["Lack of interest or caring","Great enthusiasm","Anger"], c:0, e:"Apathy = not caring, indifference."},
+    {q:"What is the antonym of <em>scarcity</em>?", a:["Abundance","Shortage","Balance"], c:0, e:"Scarcity = not enough; abundance = more than enough."},
+    {q:"\"The evidence was irrefutable.\" <em>Irrefutable</em> means:", a:["Impossible to deny","Easy to argue against","Confusing"], c:0, e:"Irrefutable = cannot be proven wrong."},
+    {q:"Which word is a synonym for <em>furious</em>?", a:["Enraged","Happy","Confused"], c:0, e:"Furious, enraged, livid all mean extremely angry."},
+    {q:"\"Marcus slammed his locker and kicked his backpack.\" You can infer Marcus is:", a:["Angry or upset","Happy","Tired"], c:0, e:"Slamming and kicking = physical signs of anger/frustration."},
+    {q:"A story's kitchen is dark and silent on a day it's usually busy. You can infer:", a:["Something is wrong with the person who usually cooks","It's a normal day","Everyone is outside playing"], c:0, e:"A break in routine signals something has changed."},
+    {q:"\"The new student kept glancing at a group then looking away.\" She is probably:", a:["Wanting to join them but feeling shy","Angry at them","Not interested in making friends"], c:0, e:"Glancing = interest; looking away quickly = nervousness."},
+    {q:"What does the prefix <em>mis-</em> mean?", a:["Wrong or badly","Again","Before"], c:0, e:"Mis- = wrong (mistake, misunderstand, mislead)."},
+    {q:"What does the prefix <em>pre-</em> mean?", a:["Before","After","Against"], c:0, e:"Pre- = before (preview, predict, prehistoric)."},
+    {q:"What does the prefix <em>re-</em> mean?", a:["Again","Not","Under"], c:0, e:"Re- = again (redo, rewrite, rebuild)."},
+    {q:"\"The principal's demeanor was stern.\" <em>Demeanor</em> means:", a:["Outward behavior or manner","Clothing","Office"], c:0, e:"Demeanor = how someone appears and behaves outwardly."},
+    {q:"Which sentence uses <em>affect</em> correctly?", a:["The rain will affect our plans.","The affect of the rain was clear.","She had a great affect on him."], c:0, e:"Affect = verb (to influence). Effect = noun (the result)."},
+    {q:"Which sentence uses <em>their/there/they're</em> correctly?", a:["They're going to their house over there.","Their going to they're house over there.","There going to their house over they're."], c:0, e:"They're = they are. Their = belonging to them. There = a place."},
+    {q:"\"The author's tone was sardonic.\" <em>Sardonic</em> means:", a:["Mocking or cynical","Happy","Sad"], c:0, e:"Sardonic = grimly mocking, sarcastic."},
+    {q:"What is the antonym of <em>courageous</em>?", a:["Cowardly","Brave","Strong"], c:0, e:"Courageous = brave; cowardly = lacking courage."},
+    {q:"\"He was a novice at surfing.\" <em>Novice</em> means:", a:["Beginner","Expert","Teacher"], c:0, e:"Novice = someone new to an activity, a beginner."},
+    {q:"What does the root <em>spec/spect</em> mean?", a:["To look or see","To hear","To touch"], c:0, e:"Spec/spect = look (inspect, spectacle, spectator)."},
+    {q:"What does the root <em>port</em> mean?", a:["To carry","To eat","To sleep"], c:0, e:"Port = carry (transport, portable, export, import)."},
+    {q:"\"Her voice was barely audible.\" <em>Audible</em> means:", a:["Able to be heard","Invisible","Very loud"], c:0, e:"Aud = hear. Audible = can be heard."},
+    {q:"What is the antonym of <em>timid</em>?", a:["Bold","Shy","Quiet"], c:0, e:"Timid = shy/fearful; bold = confident/brave."},
+    {q:"\"The smoke was a loud, unavoidable message written in ash.\" The hidden meaning:", a:["The protest was impossible to ignore","Someone wrote on the ground","The fire was an accident"], c:0, e:"The fire was a deliberate act of protest that demanded attention."},
+    {q:"A character \"carried no weapons, only a torch and determination.\" This suggests:", a:["Her power came from courage, not violence","She forgot her weapons","She was weak"], c:0, e:"The contrast shows strength through willpower, not physical force."},
+    {q:"\"The dilapidated building was condemned.\" <em>Dilapidated</em> means:", a:["Falling apart, in disrepair","Brand new","Very tall"], c:0, e:"Dilapidated = in a state of ruin or decay."},
+    {q:"Which word means \"to make something less severe\"?", a:["Mitigate","Aggravate","Eliminate"], c:0, e:"Mitigate = reduce the severity of something."}
+],
+math: [
+    {q:"What is 3/4 ÷ 1/2?", a:["3/2 (or 1½)","3/8","1/4"], c:0, e:"Keep, Change, Flip: 3/4 × 2/1 = 6/4 = 3/2"},
+    {q:"Solve: 1.25 × 4", a:["5","4.25","5.25"], c:0, e:"125 × 4 = 500, move decimal: 5.00 = 5"},
+    {q:"A recipe uses 2 cups sugar for 5 cups flour. Ratio of sugar to flour?", a:["2:5","5:2","2:7"], c:0, e:"Ratios compare in the order asked: sugar:flour = 2:5"},
+    {q:"Simplify: 3(x + 4)", a:["3x + 12","3x + 4","7x"], c:0, e:"Distributive property: 3×x + 3×4 = 3x + 12"},
+    {q:"Solve: -3 + (-5)", a:["-8","-2","8"], c:0, e:"Two negatives: add and keep the negative sign."},
+    {q:"If 2x + 5 = 13, what is x?", a:["4","9","6"], c:0, e:"2x = 13-5 = 8, x = 8÷2 = 4"},
+    {q:"3 notebooks cost $6. How much for 7?", a:["$14","$12","$21"], c:0, e:"Unit rate: $6÷3 = $2 each. $2×7 = $14"},
+    {q:"A ferry goes 15 miles in 30 min. Speed per hour?", a:["30 mph","15 mph","45 mph"], c:0, e:"Double the 30-min distance: 15×2 = 30 mph"},
+    {q:"Simplify: 18/24", a:["3/4","2/3","9/12"], c:0, e:"GCF is 6: 18÷6=3, 24÷6=4 → 3/4"},
+    {q:"Solve: -7 + 3", a:["-4","4","-10"], c:0, e:"7 is bigger (negative), 7-3=4, keep negative: -4"},
+    {q:"Solve: 5 - (-3)", a:["8","2","-8"], c:0, e:"Subtracting negative = adding: 5+3 = 8"},
+    {q:"Solve: 4x - 8 = 20", a:["x = 7","x = 3","x = 5"], c:0, e:"4x = 28, x = 7"},
+    {q:"What is 2/3 + 1/4?", a:["11/12","3/7","3/12"], c:0, e:"LCD=12: 8/12 + 3/12 = 11/12"},
+    {q:"Solve: x/5 + 4 = 9", a:["x = 25","x = 5","x = 45"], c:0, e:"x/5 = 5, x = 25"},
+    {q:"What is 15% of 80?", a:["12","15","8"], c:0, e:"0.15 × 80 = 12"},
+    {q:"Solve the proportion: 3/5 = x/20", a:["x = 12","x = 15","x = 8"], c:0, e:"Cross multiply: 3×20 = 5x, 60 = 5x, x = 12"},
+    {q:"What is the unit rate: 240 miles in 4 hours?", a:["60 mph","240 mph","40 mph"], c:0, e:"240 ÷ 4 = 60 miles per hour"},
+    {q:"Solve: -4 × (-6)", a:["24","-24","10"], c:0, e:"Negative × negative = positive: 4×6 = 24"},
+    {q:"Solve: -15 ÷ 3", a:["-5","5","-12"], c:0, e:"Negative ÷ positive = negative: 15÷3 = 5, keep negative"},
+    {q:"What is 3/5 as a decimal?", a:["0.6","0.35","0.53"], c:0, e:"3 ÷ 5 = 0.6"},
+    {q:"Solve: 3x + 7 = 28", a:["x = 7","x = 9","x = 3"], c:0, e:"3x = 21, x = 7"},
+    {q:"What is 40% of 150?", a:["60","40","45"], c:0, e:"0.40 × 150 = 60"},
+    {q:"Solve: -2 + 9", a:["7","-7","11"], c:0, e:"9 is bigger (positive), 9-2=7, positive."},
+    {q:"A map scale: 1 in = 4 miles. 3.5 inches = ?", a:["14 miles","7 miles","12 miles"], c:0, e:"3.5 × 4 = 14 miles"},
+    {q:"Solve: 6x = -42", a:["x = -7","x = 7","x = -6"], c:0, e:"-42 ÷ 6 = -7"},
+    {q:"What is 5/8 - 1/4?", a:["3/8","4/8","1/2"], c:0, e:"LCD=8: 5/8 - 2/8 = 3/8"},
+    {q:"Solve: -8 - (-3)", a:["-5","-11","5"], c:0, e:"Change to adding: -8 + 3 = -5"},
+    {q:"Which is greater: -3 or -7?", a:["-3","-7","They're equal"], c:0, e:"-3 is closer to 0, so it's greater."},
+    {q:"Solve: x/3 - 2 = 5", a:["x = 21","x = 9","x = 15"], c:0, e:"x/3 = 7, x = 21"},
+    {q:"Convert 7/20 to a percent:", a:["35%","70%","20%"], c:0, e:"7÷20 = 0.35 = 35%"},
+    {q:"Solve: 5(x - 2) = 30", a:["x = 8","x = 4","x = 6"], c:0, e:"5x - 10 = 30, 5x = 40, x = 8"},
+    {q:"What is the GCF of 12 and 18?", a:["6","3","12"], c:0, e:"Factors of 12: 1,2,3,4,6,12. Factors of 18: 1,2,3,6,9,18. GCF=6"},
+    {q:"What is the LCM of 4 and 6?", a:["12","24","6"], c:0, e:"Multiples of 4: 4,8,12... Multiples of 6: 6,12... LCM=12"},
+    {q:"Solve: |−9| = ?", a:["9","-9","0"], c:0, e:"Absolute value = distance from 0, always positive."},
+    {q:"If y = 3x + 2, what is y when x = 4?", a:["14","12","10"], c:0, e:"y = 3(4) + 2 = 12 + 2 = 14"},
+    {q:"Solve: 2(x + 3) = 5x - 6", a:["x = 4","x = 3","x = 6"], c:0, e:"2x+6 = 5x-6, 12 = 3x, x = 4"},
+    {q:"Which is bigger: 3/5 or 4/7?", a:["3/5","4/7","They're equal"], c:0, e:"3/5=0.6, 4/7≈0.571. 0.6 > 0.571"},
+    {q:"A shirt is $40 with 25% off. Sale price?", a:["$30","$35","$25"], c:0, e:"25% of 40 = $10 off. $40 - $10 = $30"},
+    {q:"Solve: -3(x + 4) = -21", a:["x = 3","x = -3","x = 7"], c:0, e:"-3x - 12 = -21, -3x = -9, x = 3"},
+    {q:"What is 0.75 as a fraction?", a:["3/4","7/5","75/10"], c:0, e:"0.75 = 75/100 = 3/4"},
+    {q:"Solve: 4/x = 8/14", a:["x = 7","x = 4","x = 28"], c:0, e:"Cross multiply: 4×14 = 8x, 56 = 8x, x = 7"},
+    {q:"What is (-2)³?", a:["-8","8","6"], c:0, e:"(-2)×(-2)×(-2) = 4×(-2) = -8"},
+    {q:"A car goes 180 mi on 6 gallons. Miles per gallon?", a:["30 mpg","18 mpg","36 mpg"], c:0, e:"180 ÷ 6 = 30 mpg"},
+    {q:"Solve: x + (-4) = 12", a:["x = 16","x = 8","x = -16"], c:0, e:"x - 4 = 12, x = 16"},
+    {q:"What is 2/3 of 45?", a:["30","15","22.5"], c:0, e:"45 × 2/3 = 90/3 = 30"},
+    {q:"Solve: -x = 7", a:["x = -7","x = 7","x = 0"], c:0, e:"Multiply both sides by -1: x = -7"},
+    {q:"200 m in 25 sec vs 150 m in 20 sec. Which is faster?", a:["200m in 25s (8 m/s)","150m in 20s (7.5 m/s)","Same speed"], c:0, e:"200÷25=8 m/s vs 150÷20=7.5 m/s. 8 > 7.5"},
+    {q:"2 cups rice feeds 6 people. How much for 15 people?", a:["5 cups","4 cups","6 cups"], c:0, e:"2/6 = x/15, 6x=30, x=5 cups"},
+    {q:"Solve: 7 - 2x = 1", a:["x = 3","x = -3","x = 4"], c:0, e:"−2x = −6, x = 3"},
+    {q:"On a map 2cm = 5km. Towns are 8cm apart. Real distance?", a:["20 km","16 km","40 km"], c:0, e:"2/5 = 8/x, 2x=40, x=20 km"},
+    {q:"What is 1/3 + 1/6?", a:["1/2","2/9","2/6"], c:0, e:"LCD=6: 2/6 + 1/6 = 3/6 = 1/2"},
+    {q:"Solve: 10 - 3x = -5", a:["x = 5","x = -5","x = 3"], c:0, e:"-3x = -15, x = 5"},
+    {q:"What is 3² + 4²?", a:["25","7","49"], c:0, e:"9 + 16 = 25 (this is also 5²!)"},
+    {q:"You earn $45 for 5 hours. How much for 8 hours?", a:["$72","$80","$56"], c:0, e:"$45÷5 = $9/hr. $9×8 = $72"},
+    {q:"Solve: x² = 49", a:["x = 7 or x = -7","x = 7 only","x = 49"], c:0, e:"Both 7² and (-7)² equal 49."},
+    {q:"What is 125% as a decimal?", a:["1.25","0.125","12.5"], c:0, e:"125 ÷ 100 = 1.25"},
+    {q:"Simplify: 4x + 3x - 2x", a:["5x","9x","x"], c:0, e:"Like terms: (4+3-2)x = 5x"},
+    {q:"If a triangle has angles 50° and 60°, what's the third?", a:["70°","80°","90°"], c:0, e:"Angles sum to 180°: 180-50-60 = 70°"},
+    {q:"Solve: 2(3x - 1) = 16", a:["x = 3","x = 6","x = 2"], c:0, e:"6x - 2 = 16, 6x = 18, x = 3"},
+    {q:"What is the mean of 4, 8, 6, 10, 12?", a:["8","6","10"], c:0, e:"Sum = 40, count = 5, mean = 40÷5 = 8"}
+],
+science: [
+    {q:"What organelle is known as the 'powerhouse' of the cell?", a:["Mitochondria","Nucleus","Ribosome"], c:0, e:"Mitochondria generates chemical energy (ATP) for the cell."},
+    {q:"What is the primary energy source for most ecosystems?", a:["The Sun","Water","Soil"], c:0, e:"The Sun drives photosynthesis, which starts the food chain."},
+    {q:"Name the three primary layers of Earth (outside in):", a:["Crust, mantle, core","Rock, magma, iron","Surface, middle, center"], c:0, e:"Crust (thin outer), mantle (thick middle), core (dense center)."},
+    {q:"Water turning from liquid to gas is called:", a:["Evaporation","Condensation","Precipitation"], c:0, e:"Evaporation = liquid → gas phase change."},
+    {q:"What is the difference between an atom and a molecule?", a:["Atom is one unit; molecule is atoms bonded together","They're the same","Molecule is smaller"], c:0, e:"Atoms combine/bond to form molecules."},
+    {q:"What happens at a convergent plate boundary?", a:["Mountains, earthquakes, or volcanoes","New ocean floor forms","Plates slide past smoothly"], c:0, e:"Convergent = plates collide → mountains/quakes."},
+    {q:"What happens to water molecules when boiled?", a:["Speed up and spread apart","Slow down and stick together","Disappear"], c:0, e:"Heat energy breaks bonds, molecules move faster."},
+    {q:"Plants make food from sunlight. This process is:", a:["Photosynthesis","Respiration","Fermentation"], c:0, e:"Photo (light) + synthesis (making) = making food from light."},
+    {q:"What does DNA stand for?", a:["Deoxyribonucleic acid","Direct Nucleic Acid","Double Nucleus Assembly"], c:0, e:"DNA = deoxyribonucleic acid, the blueprint of life."},
+    {q:"What part of the cell contains DNA?", a:["Nucleus","Mitochondria","Cell membrane"], c:0, e:"The nucleus is the 'control center' holding genetic info."},
+    {q:"What is the chemical formula for water?", a:["H₂O","CO₂","O₂"], c:0, e:"2 hydrogen atoms + 1 oxygen atom = H₂O"},
+    {q:"What is the chemical formula for carbon dioxide?", a:["CO₂","H₂O","NaCl"], c:0, e:"1 carbon + 2 oxygen atoms = CO₂"},
+    {q:"Which state of matter has a fixed shape AND volume?", a:["Solid","Liquid","Gas"], c:0, e:"Solids keep their shape; liquids and gases take container shape."},
+    {q:"Which state of matter takes the shape of its container but has fixed volume?", a:["Liquid","Solid","Gas"], c:0, e:"Liquids flow to fill container shape but keep same volume."},
+    {q:"What causes Earth's tectonic plates to move?", a:["Convection currents in the mantle","Wind on the surface","The Moon's gravity"], c:0, e:"Hot mantle rock rises, cools, and sinks in circular currents."},
+    {q:"What type of rock forms from cooled magma or lava?", a:["Igneous","Sedimentary","Metamorphic"], c:0, e:"Igneous = from fire. Magma cools → solid rock."},
+    {q:"What type of rock forms from layers compressed over time?", a:["Sedimentary","Igneous","Metamorphic"], c:0, e:"Sediment layers pile up and are pressed into rock."},
+    {q:"What changes sedimentary rock into metamorphic rock?", a:["Extreme heat and pressure","Water erosion","Freezing"], c:0, e:"Deep underground heat + pressure transforms rock."},
+    {q:"What gas do plants release during photosynthesis?", a:["Oxygen (O₂)","Carbon dioxide (CO₂)","Nitrogen (N₂)"], c:0, e:"Plants take in CO₂ and release O₂ as a byproduct."},
+    {q:"What gas do humans exhale?", a:["Carbon dioxide (CO₂)","Oxygen (O₂)","Hydrogen (H₂)"], c:0, e:"We breathe in O₂ and breathe out CO₂."},
+    {q:"Rust forming on iron is a chemical or physical change?", a:["Chemical change","Physical change","Neither"], c:0, e:"New substance (iron oxide) forms. Can't easily reverse."},
+    {q:"Ice melting is a chemical or physical change?", a:["Physical change","Chemical change","Neither"], c:0, e:"Still H₂O, just changed state. Easily reversible."},
+    {q:"What organ system includes the heart and blood vessels?", a:["Circulatory system","Respiratory system","Digestive system"], c:0, e:"The circulatory system pumps blood throughout the body."},
+    {q:"What is the function of the respiratory system?", a:["Exchange oxygen and carbon dioxide","Digest food","Filter blood"], c:0, e:"Lungs bring in O₂ and remove CO₂ from blood."},
+    {q:"What is an ecosystem?", a:["Living things + their physical environment interacting","Just animals in an area","Only the plants in a forest"], c:0, e:"Ecosystem = all living (biotic) + non-living (abiotic) things interacting."},
+    {q:"What is a food chain?", a:["The path of energy from one organism to another","A grocery store list","How food is cooked"], c:0, e:"Sun → producer → primary consumer → secondary consumer..."},
+    {q:"What is a producer in an ecosystem?", a:["An organism that makes its own food (like plants)","An animal that hunts","A decomposer"], c:0, e:"Producers = plants/algae that photosynthesize."},
+    {q:"What is a decomposer?", a:["Organism that breaks down dead matter","An animal that hunts prey","A plant that makes food"], c:0, e:"Fungi and bacteria decompose dead organisms, recycling nutrients."},
+    {q:"What determines what element an atom is?", a:["Number of protons","Number of electrons","Size of the atom"], c:0, e:"Proton count = atomic number = element identity."},
+    {q:"What charge does a proton have?", a:["Positive (+)","Negative (-)","Neutral (0)"], c:0, e:"Protons are positive, in the nucleus."},
+    {q:"What charge does an electron have?", a:["Negative (-)","Positive (+)","Neutral (0)"], c:0, e:"Electrons are negative, orbiting the nucleus."},
+    {q:"What charge does a neutron have?", a:["Neutral (0)","Positive (+)","Negative (-)"], c:0, e:"Neutrons have no charge (neutral), found in nucleus."},
+    {q:"What is the pH of a neutral substance?", a:["7","0","14"], c:0, e:"pH 7 = neutral. Below 7 = acid. Above 7 = base."},
+    {q:"Which is an acid: lemon juice or soap?", a:["Lemon juice","Soap","Both"], c:0, e:"Lemon juice is acidic (pH ~2). Soap is basic (pH ~9-10)."},
+    {q:"What is Newton's First Law of Motion?", a:["An object stays at rest or in motion unless a force acts on it","Force = mass × acceleration","Every action has an equal reaction"], c:0, e:"Also called the Law of Inertia."},
+    {q:"What is the formula for speed?", a:["Speed = distance ÷ time","Speed = time ÷ distance","Speed = distance × time"], c:0, e:"Speed tells you how far you go per unit of time."},
+    {q:"What type of energy does a moving object have?", a:["Kinetic energy","Potential energy","Thermal energy"], c:0, e:"Kinetic = energy of motion. Faster = more kinetic energy."},
+    {q:"What type of energy does a stretched rubber band have?", a:["Potential energy (elastic)","Kinetic energy","Sound energy"], c:0, e:"Stored energy ready to be released = potential energy."},
+    {q:"What is gravity?", a:["Force that pulls objects toward each other","Force that pushes objects apart","Energy from the Sun"], c:0, e:"Gravity attracts all objects with mass toward each other."},
+    {q:"Sound travels fastest through:", a:["Solids","Liquids","Gases"], c:0, e:"Particles closer together = faster sound travel. Solid > liquid > gas."},
+    {q:"Light travels fastest through:", a:["Vacuum (empty space)","Water","Glass"], c:0, e:"Light is fastest with nothing in the way (speed of light in vacuum)."},
+    {q:"What causes seasons on Earth?", a:["Earth's tilted axis as it orbits the Sun","Distance from the Sun","The Moon's position"], c:0, e:"The 23.5° tilt causes different areas to get more/less direct sunlight."},
+    {q:"How long does Earth take to orbit the Sun?", a:["365.25 days (1 year)","24 hours","30 days"], c:0, e:"One full orbit = one year. The .25 is why we have leap years."},
+    {q:"How long does Earth take to rotate once on its axis?", a:["24 hours (1 day)","365 days","1 month"], c:0, e:"One rotation = one day/night cycle."},
+    {q:"What causes ocean tides?", a:["The Moon's gravitational pull","Wind","Earth's rotation alone"], c:0, e:"The Moon's gravity pulls ocean water, creating high and low tides."},
+    {q:"What is the water cycle in order?", a:["Evaporation → Condensation → Precipitation","Precipitation → Evaporation → Condensation","Condensation → Precipitation → Evaporation"], c:0, e:"Water evaporates, forms clouds (condenses), falls as rain (precipitates)."},
+    {q:"What happens during condensation?", a:["Gas turns to liquid (clouds form)","Liquid turns to gas","Solid turns to liquid"], c:0, e:"Water vapor cools and turns back into tiny liquid droplets."},
+    {q:"What layer of Earth's atmosphere do we live in?", a:["Troposphere","Stratosphere","Mesosphere"], c:0, e:"The troposphere is the lowest layer where weather happens."},
+    {q:"What gas makes up most of Earth's atmosphere?", a:["Nitrogen (~78%)","Oxygen (~21%)","Carbon dioxide"], c:0, e:"Atmosphere: ~78% nitrogen, ~21% oxygen, ~1% other gases."},
+    {q:"What is natural selection?", a:["Organisms better adapted to their environment survive and reproduce more","Animals choosing their food","Humans selecting pets"], c:0, e:"'Survival of the fittest' — traits that help survival get passed on."},
+    {q:"What is an adaptation?", a:["A trait that helps an organism survive in its environment","A type of disease","A chemical reaction"], c:0, e:"Example: polar bear's thick fur is an adaptation to cold."},
+    {q:"What is the difference between a cell membrane and a cell wall?", a:["All cells have membranes; only plant cells have walls too","They're the same thing","Only animal cells have walls"], c:0, e:"Cell wall (plants only) = rigid outer layer. Membrane = flexible barrier."},
+    {q:"What does chlorophyll do?", a:["Absorbs sunlight for photosynthesis (makes plants green)","Helps animals breathe","Breaks down food in the stomach"], c:0, e:"Chlorophyll captures light energy and gives plants their green color."},
+    {q:"What is a watershed?", a:["An area of land where all water drains to one body of water","A building that stores water","A type of dam"], c:0, e:"All rain in a watershed flows to the same river, lake, or ocean."},
+    {q:"What causes a volcanic eruption?", a:["Pressure from magma rising to the surface","Cold weather","Earthquakes only"], c:0, e:"Magma builds up pressure underground until it breaks through."},
+    {q:"What is the ozone layer and why is it important?", a:["Protects Earth from harmful UV radiation","Makes rain possible","Holds oxygen near the surface"], c:0, e:"Ozone (O₃) in the stratosphere blocks dangerous ultraviolet rays."},
+    {q:"Fossil fuels (coal, oil, gas) are formed from:", a:["Ancient dead organisms compressed over millions of years","Rocks melting","Volcanic eruptions"], c:0, e:"Dead plants/animals buried and compressed = fossil fuels."},
+    {q:"What is the difference between renewable and non-renewable energy?", a:["Renewable replenishes naturally; non-renewable runs out","They're the same","Renewable is more expensive"], c:0, e:"Solar, wind = renewable. Coal, oil = non-renewable (limited supply)."},
+    {q:"What type of plate boundary creates new ocean floor?", a:["Divergent","Convergent","Transform"], c:0, e:"Plates pull apart → magma rises → new crust forms (mid-ocean ridges)."},
+    {q:"What evidence proved continents were once connected?", a:["Matching fossils and rock types on different continents","Similar weather patterns","Identical languages"], c:0, e:"Same fossils on Africa & South America = they were once joined (Pangaea)."}
+]
+};
 
-    function showSection(id) {
-        document.querySelectorAll('.quiz-section').forEach(s => s.classList.remove('active'));
-        document.getElementById(id).classList.add('active');
-        window.scrollTo(0, 0);
-        if (id === 'progress') updateProgressUI();
+// ========== QUIZ ENGINE ==========
+let currentQuiz = null;
+let quizCorrect = 0;
+let quizTotal = 0;
+let quizQuestions = [];
+
+function shuffle(arr) {
+    const a = [...arr];
+    for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
     }
+    return a;
+}
 
-    function checkAnswer(label, isCorrect, questionId) {
-        const question = document.getElementById(questionId);
-        if (question.dataset.answered) return;
-        question.dataset.answered = 'true';
+function startQuiz(subject) {
+    currentQuiz = subject;
+    quizCorrect = 0;
+    quizTotal = 0;
+    // Pick 20 random questions from pool of 60
+    quizQuestions = shuffle(questionBanks[subject]).slice(0, 20);
+    renderQuiz();
+    showSection('quiz-container');
+}
 
-        const section = question.closest('.quiz-section').id;
-        if (!scores[section]) scores[section] = { correct: 0, total: 0 };
-        scores[section].total++;
+function retryQuiz() {
+    startQuiz(currentQuiz);
+}
 
-        if (isCorrect) {
-            label.classList.add('correct');
-            scores[section].correct++;
-        } else {
-            label.classList.add('wrong');
-            question.querySelectorAll('label').forEach(l => {
-                if (l.onclick.toString().includes('true')) l.classList.add('correct');
-            });
-        }
-        question.querySelector('.explanation').style.display = 'block';
+function renderQuiz() {
+    const titles = { ela: '📖 English Language Arts', math: '🧮 Mathematics', science: '🔬 Science' };
+    document.getElementById('quiz-title').textContent = titles[currentQuiz];
+    document.getElementById('quiz-progress-text').textContent = `20 questions (randomly selected from 60)`;
+    document.getElementById('quiz-score').style.display = 'none';
+    document.getElementById('quiz-retry-btn').style.display = 'none';
 
-        // Check if all questions in section answered
-        const allQuestions = question.closest('.quiz-section').querySelectorAll('.question');
-        const answered = question.closest('.quiz-section').querySelectorAll('.question[data-answered]');
-        if (allQuestions.length === answered.length) {
-            const scoreBox = question.closest('.quiz-section').querySelector('.score-box');
-            if (scoreBox) {
-                const s = scores[section];
-                const pct = Math.round((s.correct / s.total) * 100);
-                let emoji = pct >= 80 ? '🌟' : pct >= 60 ? '👍' : '💪';
-                scoreBox.innerHTML = `${emoji} Score: ${s.correct}/${s.total} (${pct}%)`;
-                scoreBox.style.display = 'block';
-            }
-            // Save quiz score
-            saveQuizScore(section, scores[section]);
-            // Unlock first-quiz badge
-            unlockBadge('badge-first');
-        }
-    }
+    const container = document.getElementById('quiz-questions');
+    container.innerHTML = '';
 
-    // --- Progress Tracker ---
-    function getProgress() {
-        return JSON.parse(localStorage.getItem('aaden-progress') || '{}');
-    }
-    function saveProgress(data) {
-        localStorage.setItem('aaden-progress', JSON.stringify(data));
-    }
-    function getQuizScores() {
-        return JSON.parse(localStorage.getItem('aaden-scores') || '{}');
-    }
-    function saveQuizScore(quizId, score) {
-        const scores = getQuizScores();
-        scores[quizId] = score;
-        localStorage.setItem('aaden-scores', JSON.stringify(scores));
-    }
+    quizQuestions.forEach((q, i) => {
+        const qDiv = document.createElement('div');
+        qDiv.className = 'question';
+        qDiv.id = 'dq-' + i;
 
-    function toggleTask(el) {
-        const task = el.dataset.task;
-        const progress = getProgress();
-        const isDone = !progress[task];
-        progress[task] = isDone;
-        saveProgress(progress);
-        updateTaskUI(el, isDone);
-        updateProgressUI();
-    }
+        // Shuffle answer order but track which is correct
+        const answerIndices = shuffle([0, 1, 2]);
+        const correctIdx = answerIndices.indexOf(q.c);
 
-    function updateTaskUI(el, isDone) {
-        const label = el.nextElementSibling;
-        if (isDone) {
-            el.classList.add('done');
-            label.classList.add('done-text');
-        } else {
-            el.classList.remove('done');
-            label.classList.remove('done-text');
-        }
-    }
-
-    function updateProgressUI() {
-        const progress = getProgress();
-        const checks = document.querySelectorAll('.tracker-check');
-        let done = 0;
-        const total = checks.length;
-
-        checks.forEach(el => {
-            const task = el.dataset.task;
-            if (progress[task]) {
-                el.classList.add('done');
-                el.nextElementSibling.classList.add('done-text');
-                done++;
-            } else {
-                el.classList.remove('done');
-                el.nextElementSibling.classList.remove('done-text');
-            }
+        let html = `<p>${i+1}. ${q.q}</p>`;
+        answerIndices.forEach((ai, li) => {
+            const letter = ['A','B','C'][li];
+            html += `<label onclick="handleQuizAnswer(this, ${li === correctIdx}, 'dq-${i}')">
+                <input type="radio" name="dq-${i}"> ${letter}) ${q.a[ai]}</label>`;
         });
-
-        const pct = total > 0 ? Math.round((done / total) * 100) : 0;
-        document.getElementById('overall-pct').textContent = pct + '%';
-        document.getElementById('overall-bar').style.width = pct + '%';
-        document.getElementById('home-progress-summary').textContent =
-            `${done}/${total} tasks complete (${pct}%)`;
-
-        // Check badges
-        checkBadges(progress);
-    }
-
-    function checkBadges(progress) {
-        const quizScores = getQuizScores();
-        if (Object.keys(quizScores).length > 0) unlockBadge('badge-first');
-
-        // ELA complete (weeks 1-4 ELA tasks)
-        if (progress['w1-ela-vocab'] && progress['w2-fireburn'] && progress['w3-vocabulary'] && progress['w4-inference'])
-            unlockBadge('badge-ela');
-        // Math complete
-        if (progress['w1-math-diag'] && progress['w2-integers'] && progress['w3-equations'] && progress['w4-proportions'])
-            unlockBadge('badge-math');
-        // Science complete
-        if (progress['w1-sci-diag'] && progress['w2-atoms'] && progress['w3-tectonics'])
-            unlockBadge('badge-science');
-        // Spelling
-        if (progress['w1-spelling1'] && progress['w2-spelling2'] && progress['w3-spelling3'] && progress['w4-spellingfinal'])
-            unlockBadge('badge-spelling');
-        // Master — all done
-        const checks = document.querySelectorAll('.tracker-check');
-        let allDone = true;
-        checks.forEach(el => { if (!progress[el.dataset.task]) allDone = false; });
-        if (allDone) unlockBadge('badge-master');
-    }
-
-    function unlockBadge(id) {
-        const badge = document.getElementById(id);
-        if (badge) {
-            badge.classList.remove('badge-locked');
-            badge.classList.add('badge-earned');
-        }
-        // Also persist
-        const badges = JSON.parse(localStorage.getItem('aaden-badges') || '[]');
-        if (!badges.includes(id)) { badges.push(id); localStorage.setItem('aaden-badges', JSON.stringify(badges)); }
-    }
-
-    function resetProgress() {
-        if (confirm('Are you sure? This will erase all your progress and scores.')) {
-            localStorage.removeItem('aaden-progress');
-            localStorage.removeItem('aaden-scores');
-            localStorage.removeItem('aaden-badges');
-            updateProgressUI();
-            // Reset badge UI
-            document.querySelectorAll('.badge').forEach(b => { b.classList.remove('badge-earned'); b.classList.add('badge-locked'); });
-        }
-    }
-
-    // Load saved state on page load
-    window.addEventListener('DOMContentLoaded', () => {
-        const progress = getProgress();
-        document.querySelectorAll('.tracker-check').forEach(el => {
-            if (progress[el.dataset.task]) {
-                el.classList.add('done');
-                el.nextElementSibling.classList.add('done-text');
-            }
-        });
-        // Restore badges
-        const badges = JSON.parse(localStorage.getItem('aaden-badges') || '[]');
-        badges.forEach(id => {
-            const badge = document.getElementById(id);
-            if (badge) { badge.classList.remove('badge-locked'); badge.classList.add('badge-earned'); }
-        });
-        // Update home summary
-        const checks = document.querySelectorAll('.tracker-check');
-        let done = 0;
-        checks.forEach(el => { if (progress[el.dataset.task]) done++; });
-        const pct = checks.length > 0 ? Math.round((done / checks.length) * 100) : 0;
-        document.getElementById('home-progress-summary').textContent =
-            `${done}/${checks.length} tasks complete (${pct}%)`;
+        html += `<div class="explanation">${q.e}</div>`;
+        qDiv.innerHTML = html;
+        container.appendChild(qDiv);
     });
+}
+
+function handleQuizAnswer(label, isCorrect, questionId) {
+    const question = document.getElementById(questionId);
+    if (question.dataset.answered) return;
+    question.dataset.answered = 'true';
+    quizTotal++;
+
+    if (isCorrect) {
+        label.classList.add('correct');
+        quizCorrect++;
+    } else {
+        label.classList.add('wrong');
+        // Highlight correct
+        question.querySelectorAll('label').forEach(l => {
+            if (l.onclick.toString().includes('true,')) l.classList.add('correct');
+        });
+    }
+    // Disable other options
+    question.querySelectorAll('label').forEach(l => { if (!l.classList.contains('correct') && !l.classList.contains('wrong')) l.classList.add('disabled'); });
+    question.querySelector('.explanation').style.display = 'block';
+
+    // Check if all 20 answered
+    if (quizTotal === 20) {
+        const pct = Math.round((quizCorrect / 20) * 100);
+        let emoji = pct >= 90 ? '🌟' : pct >= 70 ? '👍' : pct >= 50 ? '💪' : '📚';
+        document.getElementById('quiz-score').innerHTML = `${emoji} Score: ${quizCorrect}/20 (${pct}%) — Every time you retake, you get different questions!`;
+        document.getElementById('quiz-score').style.display = 'block';
+        document.getElementById('quiz-retry-btn').style.display = 'inline-block';
+        saveQuizScore(currentQuiz, { correct: quizCorrect, total: 20 });
+        unlockBadge('badge-first');
+        if (currentQuiz === 'ela' && pct >= 90) unlockBadge('badge-ela');
+        if (currentQuiz === 'math' && pct >= 90) unlockBadge('badge-math');
+        if (currentQuiz === 'science' && pct >= 90) unlockBadge('badge-science');
+    }
+}
+
+// ========== NAVIGATION ==========
+function showSection(id) {
+    document.querySelectorAll('.quiz-section').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    window.scrollTo(0, 0);
+    if (id === 'progress') updateProgressUI();
+    if (id === 'spelling-test') startSpellingTest();
+}
+
+// ========== PROGRESS TRACKER ==========
+function getProgress() { return JSON.parse(localStorage.getItem('aaden-progress') || '{}'); }
+function saveProgress(data) { localStorage.setItem('aaden-progress', JSON.stringify(data)); }
+function getQuizScores() { return JSON.parse(localStorage.getItem('aaden-scores') || '{}'); }
+function saveQuizScore(id, score) {
+    const s = getQuizScores(); s[id] = score;
+    localStorage.setItem('aaden-scores', JSON.stringify(s));
+}
+
+function toggleTask(el) {
+    const task = el.dataset.task;
+    const progress = getProgress();
+    progress[task] = !progress[task];
+    saveProgress(progress);
+    updateProgressUI();
+}
+
+function updateProgressUI() {
+    const progress = getProgress();
+    const checks = document.querySelectorAll('.tracker-check');
+    let done = 0;
+    checks.forEach(el => {
+        const isDone = !!progress[el.dataset.task];
+        el.classList.toggle('done', isDone);
+        el.nextElementSibling.classList.toggle('done-text', isDone);
+        if (isDone) done++;
+    });
+    const pct = checks.length > 0 ? Math.round((done / checks.length) * 100) : 0;
+    document.getElementById('overall-pct').textContent = pct + '%';
+    document.getElementById('overall-bar').style.width = pct + '%';
+    document.getElementById('home-progress-summary').textContent = `${done}/${checks.length} tasks complete (${pct}%)`;
+    if (done === checks.length) unlockBadge('badge-master');
+}
+
+function unlockBadge(id) {
+    const badge = document.getElementById(id);
+    if (badge) { badge.classList.remove('badge-locked'); badge.classList.add('badge-earned'); }
+    const badges = JSON.parse(localStorage.getItem('aaden-badges') || '[]');
+    if (!badges.includes(id)) { badges.push(id); localStorage.setItem('aaden-badges', JSON.stringify(badges)); }
+}
+
+function resetProgress() {
+    if (confirm('Are you sure? This erases ALL progress, scores, and badges.')) {
+        localStorage.removeItem('aaden-progress');
+        localStorage.removeItem('aaden-scores');
+        localStorage.removeItem('aaden-badges');
+        updateProgressUI();
+        document.querySelectorAll('.badge').forEach(b => { b.classList.remove('badge-earned'); b.classList.add('badge-locked'); });
+    }
+}
+
+// ========== SPELLING TEST ==========
+const spellingWords = [
+    {word:'Caribbean',hint:'The sea around our islands'},
+    {word:'Separate',hint:'To divide apart'},
+    {word:'Definitely',hint:'Without any doubt'},
+    {word:'Embarrass',hint:'To make someone feel awkward'},
+    {word:'Necessary',hint:'Something you must have'},
+    {word:'Environment',hint:'The world around us, nature'},
+    {word:'Recommend',hint:'To suggest something good'},
+    {word:'Noticeable',hint:'Easy to see or spot'},
+    {word:'Mischievous',hint:'Playfully causing trouble'},
+    {word:'Occurred',hint:'Something that happened'},
+    {word:'Believe',hint:'To think something is true'},
+    {word:'Foreign',hint:'From another country'},
+    {word:'Language',hint:'How people communicate'},
+    {word:'Exaggerate',hint:'To make something sound bigger than it is'},
+    {word:'Independent',hint:'Able to do things on your own'},
+    {word:'Knowledge',hint:'What you learn and know'},
+    {word:'Maintenance',hint:'Keeping things in good condition'},
+    {word:'Schedule',hint:'A plan of times and events'},
+    {word:'Guarantee',hint:'A promise something will happen'},
+    {word:'Government',hint:'The people who run a country'}
+];
+
+let spellIndex = 0, spellResults = [], spellOrder = [];
+
+function startSpellingTest() {
+    spellIndex = 0; spellResults = [];
+    spellOrder = shuffle(spellingWords);
+    document.getElementById('spell-test-area').style.display = 'block';
+    document.getElementById('spell-results').style.display = 'none';
+    showSpellWord();
+}
+
+function showSpellWord() {
+    document.getElementById('spell-word-num').textContent = `Word ${spellIndex+1} of ${spellOrder.length}`;
+    document.getElementById('spell-hint').textContent = `Hint: "${spellOrder[spellIndex].hint}"`;
+    document.getElementById('spell-input').value = '';
+    document.getElementById('spell-input').focus();
+    document.getElementById('spell-feedback').innerHTML = '';
+}
+
+function speakCurrentWord() {
+    if ('speechSynthesis' in window) {
+        const u = new SpeechSynthesisUtterance(spellOrder[spellIndex].word);
+        u.rate = 0.8; speechSynthesis.cancel(); speechSynthesis.speak(u);
+    } else {
+        document.getElementById('spell-feedback').innerHTML = '⚠️ Speech not available. Use the hint!';
+    }
+}
+
+function checkSpelling() {
+    const input = document.getElementById('spell-input').value.trim();
+    if (!input) return;
+    const correct = spellOrder[spellIndex].word;
+    const isCorrect = input.toLowerCase() === correct.toLowerCase();
+    spellResults.push({word:correct, typed:input, correct:isCorrect});
+    document.getElementById('spell-feedback').innerHTML = isCorrect
+        ? '✅ <strong>Correct!</strong>'
+        : `❌ Correct spelling: <strong>${correct}</strong> (you typed: "${input}")`;
+    setTimeout(() => { spellIndex++; spellIndex < spellOrder.length ? showSpellWord() : showSpellResults(); }, isCorrect ? 1000 : 2500);
+}
+
+function skipWord() {
+    spellResults.push({word:spellOrder[spellIndex].word, typed:'(skipped)', correct:false});
+    spellIndex++;
+    spellIndex < spellOrder.length ? showSpellWord() : showSpellResults();
+}
+
+function showSpellResults() {
+    document.getElementById('spell-test-area').style.display = 'none';
+    document.getElementById('spell-results').style.display = 'block';
+    const correctCount = spellResults.filter(r=>r.correct).length;
+    const pct = Math.round((correctCount/20)*100);
+    let emoji = pct>=90?'🌟':pct>=70?'👍':pct>=50?'💪':'📚';
+    document.getElementById('spell-score-box').innerHTML = `${emoji} Spelling Score: ${correctCount}/20 (${pct}%)`;
+    const missed = spellResults.filter(r=>!r.correct);
+    let html = missed.length > 0
+        ? '<h3 style="margin-bottom:10px;">📝 Words to Review:</h3>' + missed.map(r=>`<div style="padding:8px 12px;margin:5px 0;background:#f8d7da;border-radius:8px;"><strong>${r.word}</strong> — you typed: "${r.typed}"</div>`).join('')
+        : '<p style="color:#28a745;font-weight:600;font-size:1.1em;">🏆 Perfect! Every word correct!</p>';
+    document.getElementById('spell-review').innerHTML = html;
+    saveQuizScore('spelling', {correct:correctCount, total:20});
+    unlockBadge('badge-first');
+    if (correctCount >= 18) unlockBadge('badge-spelling');
+}
+
+// ========== INIT ==========
+window.addEventListener('DOMContentLoaded', () => {
+    const progress = getProgress();
+    document.querySelectorAll('.tracker-check').forEach(el => {
+        if (progress[el.dataset.task]) { el.classList.add('done'); el.nextElementSibling.classList.add('done-text'); }
+    });
+    const badges = JSON.parse(localStorage.getItem('aaden-badges') || '[]');
+    badges.forEach(id => { const b = document.getElementById(id); if(b){b.classList.remove('badge-locked');b.classList.add('badge-earned');} });
+    const checks = document.querySelectorAll('.tracker-check');
+    let done = 0; checks.forEach(el => { if(progress[el.dataset.task]) done++; });
+    const pct = checks.length > 0 ? Math.round((done/checks.length)*100) : 0;
+    document.getElementById('home-progress-summary').textContent = `${done}/${checks.length} tasks complete (${pct}%)`;
+});
 </script>
 </body>
 </html>

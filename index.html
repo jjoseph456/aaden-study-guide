@@ -160,6 +160,10 @@
             <h2>📊 My Progress</h2>
             <p id="home-progress-summary">Track your weekly goals, scores & achievements</p>
         </div>
+        <div class="subject-card" onclick="showSection('game-break')" style="border-color: #28a745; background: #d4edda22;">
+            <h2>🎮 Game Break</h2>
+            <p>Earned a break? Play Emoji Catch, Word Scramble, Speed Math, or Memory Match!</p>
+        </div>
     </div>
 
     <!-- DYNAMIC QUIZ CONTAINER -->
@@ -170,8 +174,37 @@
         <div class="score-box" id="quiz-score" style="display:none"></div>
         <br>
         <button class="btn" id="quiz-next-btn" style="display:none" onclick="showNextBatch()">Next Questions →</button>
+        <button class="btn" id="quiz-game-btn" style="display:none" onclick="showSection('game-break')">🎮 Play a Game Break!</button>
         <button class="btn" id="quiz-retry-btn" style="display:none" onclick="retryQuiz()">🔄 New Set of 20</button>
         <button class="btn btn-back" onclick="showSection('home')">← Back</button>
+    </div>
+
+    <!-- GAME BREAK -->
+    <div id="game-break" class="quiz-section">
+        <h1>🎮 Game Break!</h1>
+        <p class="subtitle">You earned it! Pick a quick game to recharge your brain.</p>
+        <div class="subject-card" onclick="startGame('emoji-catch')">
+            <h2>🎯 Emoji Catch</h2>
+            <p>Tap the correct emoji as fast as you can! 30 seconds on the clock.</p>
+        </div>
+        <div class="subject-card" onclick="startGame('word-scramble')">
+            <h2>🔤 Word Scramble</h2>
+            <p>Unscramble the mixed-up letters before time runs out!</p>
+        </div>
+        <div class="subject-card" onclick="startGame('speed-math')">
+            <h2>⚡ Speed Math</h2>
+            <p>Answer as many quick math problems as you can in 30 seconds!</p>
+        </div>
+        <div class="subject-card" onclick="startGame('memory-match')">
+            <h2>🧠 Memory Match</h2>
+            <p>Flip cards and find matching pairs. Beat it in the fewest tries!</p>
+        </div>
+        <div id="game-area" style="display:none; margin-top: 20px;">
+            <div id="game-content"></div>
+        </div>
+        <br>
+        <button class="btn btn-back" onclick="showSection('quiz-container')">← Back to Quiz</button>
+        <button class="btn btn-back" onclick="showSection('home')">← Home</button>
     </div>
 
     <!-- WORDS YOU SHOULD KNOW -->
@@ -562,6 +595,7 @@ function handleQuizAnswer(label, isCorrect, questionId) {
         document.getElementById('quiz-score').innerHTML = `${emoji} Score: ${quizCorrect}/20 (${pct}%) — Every time you retake, you get different questions!`;
         document.getElementById('quiz-score').style.display = 'block';
         document.getElementById('quiz-retry-btn').style.display = 'inline-block';
+        document.getElementById('quiz-game-btn').style.display = 'inline-block';
         saveQuizScore(currentQuiz, { correct: quizCorrect, total: 20 });
         unlockBadge('badge-first');
         if (currentQuiz === 'ela' && pct >= 90) unlockBadge('badge-ela');
@@ -714,6 +748,202 @@ function showSpellResults() {
     saveQuizScore('spelling', {correct:correctCount, total:20});
     unlockBadge('badge-first');
     if (correctCount >= 18) unlockBadge('badge-spelling');
+}
+
+// ========== GAME BREAKS ==========
+let gameTimer = null;
+
+function startGame(type) {
+    document.getElementById('game-area').style.display = 'block';
+    const content = document.getElementById('game-content');
+    if (gameTimer) clearInterval(gameTimer);
+
+    if (type === 'emoji-catch') startEmojiCatch(content);
+    else if (type === 'word-scramble') startWordScramble(content);
+    else if (type === 'speed-math') startSpeedMath(content);
+    else if (type === 'memory-match') startMemoryMatch(content);
+}
+
+// --- EMOJI CATCH ---
+function startEmojiCatch(el) {
+    let score = 0, timeLeft = 30;
+    const targets = ['⭐','🎯','💎','🏆','🎮'];
+    const decoys = ['💀','🚫','❌','💣','🔥'];
+    let targetEmoji = targets[Math.floor(Math.random()*targets.length)];
+
+    el.innerHTML = `<div style="text-align:center;">
+        <p style="font-size:1.2em;">Tap only: <span style="font-size:2em;" id="ec-target">${targetEmoji}</span></p>
+        <p>Time: <strong id="ec-time">30</strong>s | Score: <strong id="ec-score">0</strong></p>
+        <div id="ec-grid" style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px;max-width:350px;margin:20px auto;"></div>
+    </div>`;
+
+    function spawnEmojis() {
+        const grid = document.getElementById('ec-grid');
+        if (!grid) return;
+        grid.innerHTML = '';
+        const all = [...targets, ...decoys];
+        for (let i = 0; i < 15; i++) {
+            const isTarget = Math.random() < 0.3;
+            const emoji = isTarget ? targetEmoji : all[Math.floor(Math.random()*all.length)];
+            const btn = document.createElement('div');
+            btn.textContent = emoji;
+            btn.style.cssText = 'font-size:2em;cursor:pointer;padding:8px;border-radius:8px;text-align:center;background:#21262d;transition:transform 0.1s;';
+            btn.onclick = () => {
+                if (emoji === targetEmoji) { score++; btn.style.transform='scale(0)'; }
+                else { score = Math.max(0, score-1); btn.style.background='#f8514933'; }
+                document.getElementById('ec-score').textContent = score;
+            };
+            grid.appendChild(btn);
+        }
+    }
+
+    spawnEmojis();
+    gameTimer = setInterval(() => {
+        timeLeft--;
+        const timeEl = document.getElementById('ec-time');
+        if (timeEl) timeEl.textContent = timeLeft;
+        if (timeLeft % 3 === 0) spawnEmojis();
+        if (timeLeft <= 0) {
+            clearInterval(gameTimer);
+            el.innerHTML = `<div class="score-box">🎯 Emoji Catch Score: ${score} points!<br><small>${score>=15?'Amazing reflexes!':score>=8?'Good job!':'Keep practicing!'}</small></div>
+            <button class="btn" onclick="startGame('emoji-catch')" style="margin-top:15px;">Play Again</button>`;
+        }
+    }, 1000);
+}
+
+// --- WORD SCRAMBLE ---
+function startWordScramble(el) {
+    const words = ['SCIENCE','INTEGER','SYNONYM','VOLCANO','NUCLEUS','DECIMAL','ANTONYM','GRAVITY','PROTEIN','CLIMATE',
+                   'FRACTION','METAPHOR','EQUATION','MULTIPLY','RESEARCH','MOLECULE','SEPARATE','LANGUAGE','TRIANGLE','DESCRIBE'];
+    const picked = shuffle(words).slice(0, 8);
+    let current = 0, score = 0, timeLeft = 60;
+
+    function scramble(w) {
+        const arr = w.split('');
+        for (let i = arr.length-1; i > 0; i--) { const j = Math.floor(Math.random()*(i+1)); [arr[i],arr[j]]=[arr[j],arr[i]]; }
+        return arr.join('') === w ? scramble(w) : arr.join('');
+    }
+
+    function showWord() {
+        if (current >= picked.length) { endGame(); return; }
+        el.innerHTML = `<div style="text-align:center;">
+            <p>Time: <strong id="ws-time">${timeLeft}</strong>s | Score: <strong>${score}/${picked.length}</strong></p>
+            <p style="font-size:0.9em;color:#8b949e;">Word ${current+1} of ${picked.length}</p>
+            <div style="font-size:2.5em;letter-spacing:8px;margin:20px 0;font-weight:bold;color:#58a6ff;" id="ws-scrambled">${scramble(picked[current])}</div>
+            <input type="text" id="ws-input" placeholder="Type the word..." style="font-size:1.3em;padding:12px 20px;border:2px solid #30363d;border-radius:8px;background:#21262d;color:#f0f6fc;text-align:center;width:80%;max-width:300px;" autocomplete="off" autocorrect="off" spellcheck="false">
+            <br><button class="btn" onclick="checkScramble()" style="margin-top:12px;">Submit</button>
+            <button class="btn btn-back" onclick="skipScramble()">Skip</button>
+            <div id="ws-feedback" style="margin-top:12px;min-height:30px;"></div>
+        </div>`;
+        document.getElementById('ws-input').focus();
+        document.getElementById('ws-input').onkeydown = (e) => { if(e.key==='Enter') checkScramble(); };
+    }
+
+    window.checkScramble = () => {
+        const input = document.getElementById('ws-input').value.trim().toUpperCase();
+        if (input === picked[current]) { score++; current++; showWord(); }
+        else { document.getElementById('ws-feedback').innerHTML = '❌ Try again!'; }
+    };
+    window.skipScramble = () => { current++; showWord(); };
+
+    function endGame() {
+        clearInterval(gameTimer);
+        el.innerHTML = `<div class="score-box">🔤 Word Scramble: ${score}/${picked.length}<br><small>${score>=6?'Word wizard!':score>=4?'Nice work!':'Keep at it!'}</small></div>
+        <button class="btn" onclick="startGame('word-scramble')" style="margin-top:15px;">Play Again</button>`;
+    }
+
+    showWord();
+    gameTimer = setInterval(() => {
+        timeLeft--;
+        const te = document.getElementById('ws-time');
+        if (te) te.textContent = timeLeft;
+        if (timeLeft <= 0) endGame();
+    }, 1000);
+}
+
+// --- SPEED MATH ---
+function startSpeedMath(el) {
+    let score = 0, timeLeft = 30, currentAnswer = 0;
+
+    function newProblem() {
+        const ops = ['+','-','×'];
+        const op = ops[Math.floor(Math.random()*ops.length)];
+        let a, b;
+        if (op === '+') { a = Math.floor(Math.random()*50)+1; b = Math.floor(Math.random()*50)+1; currentAnswer = a+b; }
+        else if (op === '-') { a = Math.floor(Math.random()*50)+10; b = Math.floor(Math.random()*a); currentAnswer = a-b; }
+        else { a = Math.floor(Math.random()*12)+1; b = Math.floor(Math.random()*12)+1; currentAnswer = a*b; }
+
+        el.innerHTML = `<div style="text-align:center;">
+            <p>Time: <strong id="sm-time">${timeLeft}</strong>s | Score: <strong id="sm-score">${score}</strong></p>
+            <div style="font-size:3em;font-weight:bold;margin:20px 0;color:#f0f6fc;">${a} ${op} ${b} = ?</div>
+            <input type="number" id="sm-input" style="font-size:1.5em;padding:12px 20px;border:2px solid #30363d;border-radius:8px;background:#21262d;color:#f0f6fc;text-align:center;width:150px;" autocomplete="off">
+            <br><button class="btn" onclick="checkSpeedMath()" style="margin-top:12px;">Submit</button>
+            <div id="sm-feedback" style="margin-top:10px;min-height:25px;"></div>
+        </div>`;
+        document.getElementById('sm-input').focus();
+        document.getElementById('sm-input').onkeydown = (e) => { if(e.key==='Enter') checkSpeedMath(); };
+    }
+
+    window.checkSpeedMath = () => {
+        const input = parseInt(document.getElementById('sm-input').value);
+        if (input === currentAnswer) { score++; newProblem(); }
+        else { document.getElementById('sm-feedback').innerHTML = '❌ Nope!'; document.getElementById('sm-input').value=''; document.getElementById('sm-input').focus(); }
+    };
+
+    newProblem();
+    gameTimer = setInterval(() => {
+        timeLeft--;
+        const te = document.getElementById('sm-time');
+        if (te) te.textContent = timeLeft;
+        const se = document.getElementById('sm-score');
+        if (se) se.textContent = score;
+        if (timeLeft <= 0) {
+            clearInterval(gameTimer);
+            el.innerHTML = `<div class="score-box">⚡ Speed Math: ${score} correct!<br><small>${score>=15?'Lightning fast!':score>=8?'Quick thinker!':'Good practice!'}</small></div>
+            <button class="btn" onclick="startGame('speed-math')" style="margin-top:15px;">Play Again</button>`;
+        }
+    }, 1000);
+}
+
+// --- MEMORY MATCH ---
+function startMemoryMatch(el) {
+    const pairs = ['🐶','🐱','🦁','🐸','🦋','🐙','🦄','🎸'];
+    const cards = shuffle([...pairs, ...pairs]);
+    let flipped = [], matched = [], moves = 0;
+
+    function render() {
+        let html = `<div style="text-align:center;"><p>Moves: <strong>${moves}</strong> | Pairs found: <strong>${matched.length/2}</strong>/8</p>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;max-width:340px;margin:15px auto;">`;
+        cards.forEach((card, i) => {
+            const isFlipped = flipped.includes(i) || matched.includes(i);
+            html += `<div onclick="flipCard(${i})" style="width:70px;height:70px;display:flex;align-items:center;justify-content:center;font-size:2em;background:${isFlipped?'#21262d':'#58a6ff'};border-radius:10px;cursor:pointer;user-select:none;transition:transform 0.2s;">${isFlipped ? card : '?'}</div>`;
+        });
+        html += `</div></div>`;
+        el.innerHTML = html;
+    }
+
+    window.flipCard = (i) => {
+        if (flipped.length >= 2 || flipped.includes(i) || matched.includes(i)) return;
+        flipped.push(i);
+        render();
+        if (flipped.length === 2) {
+            moves++;
+            if (cards[flipped[0]] === cards[flipped[1]]) {
+                matched.push(...flipped);
+                flipped = [];
+                if (matched.length === cards.length) {
+                    setTimeout(() => {
+                        el.innerHTML = `<div class="score-box">🧠 Memory Match Complete!<br>Finished in ${moves} moves<br><small>${moves<=12?'Perfect memory!':moves<=18?'Great job!':'Good effort!'}</small></div>
+                        <button class="btn" onclick="startGame('memory-match')" style="margin-top:15px;">Play Again</button>`;
+                    }, 500);
+                } else { render(); }
+            } else {
+                setTimeout(() => { flipped = []; render(); }, 1000);
+            }
+        }
+    };
+
+    render();
 }
 
 // ========== INIT ==========

@@ -43,7 +43,7 @@
             margin-bottom: 20px;
         }
         .question p { font-weight: 600; margin-bottom: 12px; font-size: 1.05em; }
-        .question label {
+        .answer-btn {
             display: block;
             padding: 10px 15px;
             margin: 5px 0;
@@ -51,11 +51,13 @@
             border-radius: 8px;
             cursor: pointer;
             transition: all 0.2s;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
         }
-        .question label:hover { border-color: #667eea; background: #f0f0ff; }
-        .question label.correct { border-color: #28a745; background: #d4edda; pointer-events: none; }
-        .question label.wrong { border-color: #dc3545; background: #f8d7da; pointer-events: none; }
-        .question label.disabled { pointer-events: none; opacity: 0.7; }
+        .answer-btn:hover { border-color: #667eea; background: #f0f0ff; }
+        .answer-btn.correct { border-color: #28a745; background: #d4edda; }
+        .answer-btn.wrong { border-color: #dc3545; background: #f8d7da; }
+        .answer-btn.disabled { pointer-events: none; opacity: 0.7; }
         .explanation {
             display: none;
             background: #e8f5e9;
@@ -322,189 +324,189 @@
 const questionBanks = {
 ela: [
     {q:"\"The sailor was cautious as the storm approached.\" Which word means the same as <em>cautious</em>?", a:["Careful","Brave","Terrified"], c:0, e:"Cautious means taking extra care to avoid danger."},
-    {q:"What is the exact opposite of <em>permanent</em>?", a:["Temporary","Lasting","Broken"], c:0, e:"Permanent = forever; temporary = for a limited time."},
+    {q:"What is the exact opposite of <em>permanent</em>?", a:["Lasting","Temporary","Broken"], c:1, e:"Permanent = forever; temporary = for a limited time."},
     {q:"\"The damage to the dock was immense, requiring months of labor.\" <em>Immense</em> means:", a:["Massive","Tiny","Standard"], c:0, e:"'Months of intense labor' = the damage was huge."},
-    {q:"Choose the sentence with correct spelling:", a:["They're going to the beach.","Their going to the beach.","There going to the beach."], c:0, e:"They're = they are. Their = ownership. There = a place."},
-    {q:"What is the exact opposite of <em>ancient</em>?", a:["Modern","Old","Classic"], c:0, e:"Ancient means extremely old; modern means current/new."},
+    {q:"Choose the sentence with correct spelling:", a:["There going to the beach.","Their going to the beach.","They're going to the beach."], c:2, e:"They're = they are. Their = ownership. There = a place."},
+    {q:"What is the exact opposite of <em>ancient</em>?", a:["Old","Classic","Modern"], c:2, e:"Ancient means extremely old; modern means current/new."},
     {q:"\"The resilient community rebuilt after the hurricane.\" <em>Resilient</em> means:", a:["Able to recover from hardship","Weak and tired","Rich and powerful"], c:0, e:"Resilient = bouncing back from difficulty."},
-    {q:"Which word is a synonym for <em>enormous</em>?", a:["Vast","Tiny","Average"], c:0, e:"Enormous, vast, immense, massive all mean very large."},
-    {q:"What is the antonym of <em>generous</em>?", a:["Selfish","Kind","Wealthy"], c:0, e:"Generous = giving freely; selfish = only thinking of yourself."},
+    {q:"Which word is a synonym for <em>enormous</em>?", a:["Tiny","Average","Vast"], c:2, e:"Enormous, vast, immense, massive all mean very large."},
+    {q:"What is the antonym of <em>generous</em>?", a:["Kind","Selfish","Wealthy"], c:1, e:"Generous = giving freely; selfish = only thinking of yourself."},
     {q:"\"She was elated when she won.\" <em>Elated</em> means:", a:["Extremely happy","Very sad","Confused"], c:0, e:"Elated = thrilled, overjoyed, ecstatic."},
     {q:"What is the antonym of <em>expand</em>?", a:["Contract","Grow","Stretch"], c:0, e:"Expand = get bigger; contract = get smaller."},
     {q:"\"The teacher's instructions were ambiguous.\" <em>Ambiguous</em> means:", a:["Unclear, could mean multiple things","Very loud","Extremely detailed"], c:0, e:"Ambiguous = having more than one possible meaning."},
-    {q:"Which word is a synonym for <em>terrified</em>?", a:["Petrified","Excited","Bored"], c:0, e:"Terrified, petrified, frightened all mean very scared."},
-    {q:"What is the antonym of <em>voluntary</em>?", a:["Mandatory","Optional","Easy"], c:0, e:"Voluntary = by choice; mandatory = required."},
+    {q:"Which word is a synonym for <em>terrified</em>?", a:["Excited","Bored","Petrified"], c:2, e:"Terrified, petrified, frightened all mean very scared."},
+    {q:"What is the antonym of <em>voluntary</em>?", a:["Optional","Easy","Mandatory"], c:2, e:"Voluntary = by choice; mandatory = required."},
     {q:"\"The abundant rainfall helped crops grow.\" <em>Abundant</em> means:", a:["Plentiful, more than enough","Scarce","Dangerous"], c:0, e:"Abundant = existing in large quantities."},
-    {q:"Which prefix makes <em>possible</em> mean the opposite?", a:["im- (impossible)","re- (repossible)","un- (unpossible)"], c:0, e:"Impossible = not possible. 'Im-' negates words starting with p/b/m."},
+    {q:"Which prefix makes <em>possible</em> mean the opposite?", a:["re- (repossible)","un- (unpossible)","im- (impossible)"], c:2, e:"Impossible = not possible. 'Im-' negates words starting with p/b/m."},
     {q:"\"He tried to conceal his disappointment.\" <em>Conceal</em> means:", a:["Hide","Show","Increase"], c:0, e:"Conceal = to hide or keep secret."},
-    {q:"What is the antonym of <em>transparent</em>?", a:["Opaque","Clear","Invisible"], c:0, e:"Transparent = see-through; opaque = cannot see through."},
+    {q:"What is the antonym of <em>transparent</em>?", a:["Clear","Opaque","Invisible"], c:1, e:"Transparent = see-through; opaque = cannot see through."},
     {q:"\"The laborers were locked in invisible chains.\" This is an example of:", a:["Metaphor","Simile","Alliteration"], c:0, e:"A metaphor compares without using 'like' or 'as'."},
     {q:"\"She ran like the wind.\" This is an example of:", a:["Simile","Metaphor","Personification"], c:0, e:"A simile uses 'like' or 'as' to compare two things."},
     {q:"\"The wind whispered through the trees.\" This is an example of:", a:["Personification","Simile","Metaphor"], c:0, e:"Personification gives human qualities to non-human things."},
     {q:"What does the root word <em>bio</em> mean?", a:["Life","Earth","Write"], c:0, e:"Bio = life (biology, biography, biome)."},
-    {q:"What does the root word <em>geo</em> mean?", a:["Earth","Water","Fire"], c:0, e:"Geo = earth (geography, geology, geometry)."},
+    {q:"What does the root word <em>geo</em> mean?", a:["Fire","Water","Earth"], c:2, e:"Geo = earth (geography, geology, geometry)."},
     {q:"What does the root word <em>aqua</em> mean?", a:["Water","Air","Land"], c:0, e:"Aqua = water (aquarium, aquatic, aqueduct)."},
-    {q:"What does the root word <em>therm</em> mean?", a:["Heat","Cold","Light"], c:0, e:"Therm = heat (thermometer, thermal, thermos)."},
+    {q:"What does the root word <em>therm</em> mean?", a:["Cold","Light","Heat"], c:2, e:"Therm = heat (thermometer, thermal, thermos)."},
     {q:"What does the root word <em>rupt</em> mean?", a:["Break","Build","Run"], c:0, e:"Rupt = break (erupt, interrupt, rupture)."},
     {q:"\"After the hurricane, neighbors who never spoke helped each other.\" The hidden meaning is:", a:["Crisis brings people together","Hurricanes are fun","Neighbors are always friendly"], c:0, e:"The contrast shows that hard times change people's behavior."},
     {q:"An author describes a character's \"tight roots gripping the earth\" after a storm. This symbolizes:", a:["Inner strength despite outward damage","Gardening tips","Fear of wind"], c:0, e:"Roots = internal strength; storm damage = external struggles."},
     {q:"\"Freedom had arrived on paper.\" This means:", a:["Laws changed but real life didn't improve","Someone wrote a letter about freedom","A newspaper reported good news"], c:0, e:"'On paper' = officially/legally, but not in practice."},
-    {q:"What is the antonym of <em>artificial</em>?", a:["Natural","Fake","Expensive"], c:0, e:"Artificial = man-made; natural = from nature."},
+    {q:"What is the antonym of <em>artificial</em>?", a:["Natural","Expensive","Fake"], c:0, e:"Artificial = man-made; natural = from nature."},
     {q:"\"The expedition was arduous.\" <em>Arduous</em> means:", a:["Extremely difficult","Easy and fun","Short"], c:0, e:"Arduous = requiring great effort, strenuous."},
-    {q:"Which word is a synonym for <em>cautious</em>?", a:["Wary","Reckless","Fast"], c:0, e:"Cautious, wary, careful all mean taking care to avoid danger."},
-    {q:"What is the antonym of <em>triumph</em>?", a:["Defeat","Victory","Celebration"], c:0, e:"Triumph = great victory; defeat = loss."},
+    {q:"Which word is a synonym for <em>cautious</em>?", a:["Reckless","Fast","Wary"], c:2, e:"Cautious, wary, careful all mean taking care to avoid danger."},
+    {q:"What is the antonym of <em>triumph</em>?", a:["Celebration","Defeat","Victory"], c:1, e:"Triumph = great victory; defeat = loss."},
     {q:"\"The frigid water made him gasp.\" <em>Frigid</em> means:", a:["Extremely cold","Warm","Salty"], c:0, e:"Frigid = intensely cold, freezing."},
     {q:"Which word means \"happening every year\"?", a:["Annual","Daily","Monthly"], c:0, e:"Annual = once per year (anniversary, annual report)."},
     {q:"\"She gave a brief summary.\" <em>Brief</em> means:", a:["Short","Long","Confusing"], c:0, e:"Brief = short in duration or length."},
-    {q:"What does <em>subterranean</em> mean? (sub = under, terra = earth)", a:["Underground","Underwater","Above ground"], c:0, e:"Sub (under) + terra (earth) = underground."},
+    {q:"What does <em>subterranean</em> mean? (sub = under, terra = earth)", a:["Above ground","Underwater","Underground"], c:2, e:"Sub (under) + terra (earth) = underground."},
     {q:"\"His apathy toward school worried his parents.\" <em>Apathy</em> means:", a:["Lack of interest or caring","Great enthusiasm","Anger"], c:0, e:"Apathy = not caring, indifference."},
-    {q:"What is the antonym of <em>scarcity</em>?", a:["Abundance","Shortage","Balance"], c:0, e:"Scarcity = not enough; abundance = more than enough."},
+    {q:"What is the antonym of <em>scarcity</em>?", a:["Balance","Shortage","Abundance"], c:2, e:"Scarcity = not enough; abundance = more than enough."},
     {q:"\"The evidence was irrefutable.\" <em>Irrefutable</em> means:", a:["Impossible to deny","Easy to argue against","Confusing"], c:0, e:"Irrefutable = cannot be proven wrong."},
-    {q:"Which word is a synonym for <em>furious</em>?", a:["Enraged","Happy","Confused"], c:0, e:"Furious, enraged, livid all mean extremely angry."},
+    {q:"Which word is a synonym for <em>furious</em>?", a:["Enraged","Confused","Happy"], c:0, e:"Furious, enraged, livid all mean extremely angry."},
     {q:"\"Marcus slammed his locker and kicked his backpack.\" You can infer Marcus is:", a:["Angry or upset","Happy","Tired"], c:0, e:"Slamming and kicking = physical signs of anger/frustration."},
-    {q:"A story's kitchen is dark and silent on a day it's usually busy. You can infer:", a:["Something is wrong with the person who usually cooks","It's a normal day","Everyone is outside playing"], c:0, e:"A break in routine signals something has changed."},
+    {q:"A story's kitchen is dark and silent on a day it's usually busy. You can infer:", a:["Everyone is outside playing","It's a normal day","Something is wrong with the person who usually cooks"], c:2, e:"A break in routine signals something has changed."},
     {q:"\"The new student kept glancing at a group then looking away.\" She is probably:", a:["Wanting to join them but feeling shy","Angry at them","Not interested in making friends"], c:0, e:"Glancing = interest; looking away quickly = nervousness."},
-    {q:"What does the prefix <em>mis-</em> mean?", a:["Wrong or badly","Again","Before"], c:0, e:"Mis- = wrong (mistake, misunderstand, mislead)."},
-    {q:"What does the prefix <em>pre-</em> mean?", a:["Before","After","Against"], c:0, e:"Pre- = before (preview, predict, prehistoric)."},
+    {q:"What does the prefix <em>mis-</em> mean?", a:["Again","Wrong or badly","Before"], c:1, e:"Mis- = wrong (mistake, misunderstand, mislead)."},
+    {q:"What does the prefix <em>pre-</em> mean?", a:["Against","Before","After"], c:1, e:"Pre- = before (preview, predict, prehistoric)."},
     {q:"What does the prefix <em>re-</em> mean?", a:["Again","Not","Under"], c:0, e:"Re- = again (redo, rewrite, rebuild)."},
     {q:"\"The principal's demeanor was stern.\" <em>Demeanor</em> means:", a:["Outward behavior or manner","Clothing","Office"], c:0, e:"Demeanor = how someone appears and behaves outwardly."},
     {q:"Which sentence uses <em>affect</em> correctly?", a:["The rain will affect our plans.","The affect of the rain was clear.","She had a great affect on him."], c:0, e:"Affect = verb (to influence). Effect = noun (the result)."},
-    {q:"Which sentence uses <em>their/there/they're</em> correctly?", a:["They're going to their house over there.","Their going to they're house over there.","There going to their house over they're."], c:0, e:"They're = they are. Their = belonging to them. There = a place."},
+    {q:"Which sentence uses <em>their/there/they're</em> correctly?", a:["Their going to they're house over there.","They're going to their house over there.","There going to their house over they're."], c:1, e:"They're = they are. Their = belonging to them. There = a place."},
     {q:"\"The author's tone was sardonic.\" <em>Sardonic</em> means:", a:["Mocking or cynical","Happy","Sad"], c:0, e:"Sardonic = grimly mocking, sarcastic."},
-    {q:"What is the antonym of <em>courageous</em>?", a:["Cowardly","Brave","Strong"], c:0, e:"Courageous = brave; cowardly = lacking courage."},
+    {q:"What is the antonym of <em>courageous</em>?", a:["Brave","Cowardly","Strong"], c:1, e:"Courageous = brave; cowardly = lacking courage."},
     {q:"\"He was a novice at surfing.\" <em>Novice</em> means:", a:["Beginner","Expert","Teacher"], c:0, e:"Novice = someone new to an activity, a beginner."},
-    {q:"What does the root <em>spec/spect</em> mean?", a:["To look or see","To hear","To touch"], c:0, e:"Spec/spect = look (inspect, spectacle, spectator)."},
-    {q:"What does the root <em>port</em> mean?", a:["To carry","To eat","To sleep"], c:0, e:"Port = carry (transport, portable, export, import)."},
+    {q:"What does the root <em>spec/spect</em> mean?", a:["To hear","To touch","To look or see"], c:2, e:"Spec/spect = look (inspect, spectacle, spectator)."},
+    {q:"What does the root <em>port</em> mean?", a:["To sleep","To carry","To eat"], c:1, e:"Port = carry (transport, portable, export, import)."},
     {q:"\"Her voice was barely audible.\" <em>Audible</em> means:", a:["Able to be heard","Invisible","Very loud"], c:0, e:"Aud = hear. Audible = can be heard."},
-    {q:"What is the antonym of <em>timid</em>?", a:["Bold","Shy","Quiet"], c:0, e:"Timid = shy/fearful; bold = confident/brave."},
+    {q:"What is the antonym of <em>timid</em>?", a:["Shy","Quiet","Bold"], c:2, e:"Timid = shy/fearful; bold = confident/brave."},
     {q:"\"The smoke was a loud, unavoidable message written in ash.\" The hidden meaning:", a:["The protest was impossible to ignore","Someone wrote on the ground","The fire was an accident"], c:0, e:"The fire was a deliberate act of protest that demanded attention."},
     {q:"A character \"carried no weapons, only a torch and determination.\" This suggests:", a:["Her power came from courage, not violence","She forgot her weapons","She was weak"], c:0, e:"The contrast shows strength through willpower, not physical force."},
     {q:"\"The dilapidated building was condemned.\" <em>Dilapidated</em> means:", a:["Falling apart, in disrepair","Brand new","Very tall"], c:0, e:"Dilapidated = in a state of ruin or decay."},
     {q:"Which word means \"to make something less severe\"?", a:["Mitigate","Aggravate","Eliminate"], c:0, e:"Mitigate = reduce the severity of something."}
 ],
 math: [
-    {q:"What is 3/4 ÷ 1/2?", a:["3/2 (or 1½)","3/8","1/4"], c:0, e:"Keep, Change, Flip: 3/4 × 2/1 = 6/4 = 3/2"},
-    {q:"Solve: 1.25 × 4", a:["5","4.25","5.25"], c:0, e:"125 × 4 = 500, move decimal: 5.00 = 5"},
-    {q:"A recipe uses 2 cups sugar for 5 cups flour. Ratio of sugar to flour?", a:["2:5","5:2","2:7"], c:0, e:"Ratios compare in the order asked: sugar:flour = 2:5"},
-    {q:"Simplify: 3(x + 4)", a:["3x + 12","3x + 4","7x"], c:0, e:"Distributive property: 3×x + 3×4 = 3x + 12"},
+    {q:"What is 3/4 ÷ 1/2?", a:["3/2 (or 1½)","1/4","3/8"], c:0, e:"Keep, Change, Flip: 3/4 × 2/1 = 6/4 = 3/2"},
+    {q:"Solve: 1.25 × 4", a:["5","5.25","4.25"], c:0, e:"125 × 4 = 500, move decimal: 5.00 = 5"},
+    {q:"A recipe uses 2 cups sugar for 5 cups flour. Ratio of sugar to flour?", a:["2:7","5:2","2:5"], c:2, e:"Ratios compare in the order asked: sugar:flour = 2:5"},
+    {q:"Simplify: 3(x + 4)", a:["7x","3x + 12","3x + 4"], c:1, e:"Distributive property: 3×x + 3×4 = 3x + 12"},
     {q:"Solve: -3 + (-5)", a:["-8","-2","8"], c:0, e:"Two negatives: add and keep the negative sign."},
-    {q:"If 2x + 5 = 13, what is x?", a:["4","9","6"], c:0, e:"2x = 13-5 = 8, x = 8÷2 = 4"},
-    {q:"3 notebooks cost $6. How much for 7?", a:["$14","$12","$21"], c:0, e:"Unit rate: $6÷3 = $2 each. $2×7 = $14"},
-    {q:"A ferry goes 15 miles in 30 min. Speed per hour?", a:["30 mph","15 mph","45 mph"], c:0, e:"Double the 30-min distance: 15×2 = 30 mph"},
-    {q:"Simplify: 18/24", a:["3/4","2/3","9/12"], c:0, e:"GCF is 6: 18÷6=3, 24÷6=4 → 3/4"},
-    {q:"Solve: -7 + 3", a:["-4","4","-10"], c:0, e:"7 is bigger (negative), 7-3=4, keep negative: -4"},
-    {q:"Solve: 5 - (-3)", a:["8","2","-8"], c:0, e:"Subtracting negative = adding: 5+3 = 8"},
+    {q:"If 2x + 5 = 13, what is x?", a:["9","4","6"], c:1, e:"2x = 13-5 = 8, x = 8÷2 = 4"},
+    {q:"3 notebooks cost $6. How much for 7?", a:["$12","$14","$21"], c:1, e:"Unit rate: $6÷3 = $2 each. $2×7 = $14"},
+    {q:"A ferry goes 15 miles in 30 min. Speed per hour?", a:["15 mph","30 mph","45 mph"], c:1, e:"Double the 30-min distance: 15×2 = 30 mph"},
+    {q:"Simplify: 18/24", a:["9/12","2/3","3/4"], c:2, e:"GCF is 6: 18÷6=3, 24÷6=4 → 3/4"},
+    {q:"Solve: -7 + 3", a:["-4","-10","4"], c:0, e:"7 is bigger (negative), 7-3=4, keep negative: -4"},
+    {q:"Solve: 5 - (-3)", a:["2","8","-8"], c:1, e:"Subtracting negative = adding: 5+3 = 8"},
     {q:"Solve: 4x - 8 = 20", a:["x = 7","x = 3","x = 5"], c:0, e:"4x = 28, x = 7"},
-    {q:"What is 2/3 + 1/4?", a:["11/12","3/7","3/12"], c:0, e:"LCD=12: 8/12 + 3/12 = 11/12"},
-    {q:"Solve: x/5 + 4 = 9", a:["x = 25","x = 5","x = 45"], c:0, e:"x/5 = 5, x = 25"},
-    {q:"What is 15% of 80?", a:["12","15","8"], c:0, e:"0.15 × 80 = 12"},
-    {q:"Solve the proportion: 3/5 = x/20", a:["x = 12","x = 15","x = 8"], c:0, e:"Cross multiply: 3×20 = 5x, 60 = 5x, x = 12"},
+    {q:"What is 2/3 + 1/4?", a:["3/7","3/12","11/12"], c:2, e:"LCD=12: 8/12 + 3/12 = 11/12"},
+    {q:"Solve: x/5 + 4 = 9", a:["x = 45","x = 5","x = 25"], c:2, e:"x/5 = 5, x = 25"},
+    {q:"What is 15% of 80?", a:["12","8","15"], c:0, e:"0.15 × 80 = 12"},
+    {q:"Solve the proportion: 3/5 = x/20", a:["x = 15","x = 8","x = 12"], c:2, e:"Cross multiply: 3×20 = 5x, 60 = 5x, x = 12"},
     {q:"What is the unit rate: 240 miles in 4 hours?", a:["60 mph","240 mph","40 mph"], c:0, e:"240 ÷ 4 = 60 miles per hour"},
-    {q:"Solve: -4 × (-6)", a:["24","-24","10"], c:0, e:"Negative × negative = positive: 4×6 = 24"},
-    {q:"Solve: -15 ÷ 3", a:["-5","5","-12"], c:0, e:"Negative ÷ positive = negative: 15÷3 = 5, keep negative"},
-    {q:"What is 3/5 as a decimal?", a:["0.6","0.35","0.53"], c:0, e:"3 ÷ 5 = 0.6"},
-    {q:"Solve: 3x + 7 = 28", a:["x = 7","x = 9","x = 3"], c:0, e:"3x = 21, x = 7"},
+    {q:"Solve: -4 × (-6)", a:["10","-24","24"], c:2, e:"Negative × negative = positive: 4×6 = 24"},
+    {q:"Solve: -15 ÷ 3", a:["-5","-12","5"], c:0, e:"Negative ÷ positive = negative: 15÷3 = 5, keep negative"},
+    {q:"What is 3/5 as a decimal?", a:["0.53","0.35","0.6"], c:2, e:"3 ÷ 5 = 0.6"},
+    {q:"Solve: 3x + 7 = 28", a:["x = 9","x = 3","x = 7"], c:2, e:"3x = 21, x = 7"},
     {q:"What is 40% of 150?", a:["60","40","45"], c:0, e:"0.40 × 150 = 60"},
     {q:"Solve: -2 + 9", a:["7","-7","11"], c:0, e:"9 is bigger (positive), 9-2=7, positive."},
     {q:"A map scale: 1 in = 4 miles. 3.5 inches = ?", a:["14 miles","7 miles","12 miles"], c:0, e:"3.5 × 4 = 14 miles"},
-    {q:"Solve: 6x = -42", a:["x = -7","x = 7","x = -6"], c:0, e:"-42 ÷ 6 = -7"},
-    {q:"What is 5/8 - 1/4?", a:["3/8","4/8","1/2"], c:0, e:"LCD=8: 5/8 - 2/8 = 3/8"},
-    {q:"Solve: -8 - (-3)", a:["-5","-11","5"], c:0, e:"Change to adding: -8 + 3 = -5"},
-    {q:"Which is greater: -3 or -7?", a:["-3","-7","They're equal"], c:0, e:"-3 is closer to 0, so it's greater."},
-    {q:"Solve: x/3 - 2 = 5", a:["x = 21","x = 9","x = 15"], c:0, e:"x/3 = 7, x = 21"},
+    {q:"Solve: 6x = -42", a:["x = -6","x = -7","x = 7"], c:1, e:"-42 ÷ 6 = -7"},
+    {q:"What is 5/8 - 1/4?", a:["1/2","4/8","3/8"], c:2, e:"LCD=8: 5/8 - 2/8 = 3/8"},
+    {q:"Solve: -8 - (-3)", a:["-11","5","-5"], c:2, e:"Change to adding: -8 + 3 = -5"},
+    {q:"Which is greater: -3 or -7?", a:["-7","They're equal","-3"], c:2, e:"-3 is closer to 0, so it's greater."},
+    {q:"Solve: x/3 - 2 = 5", a:["x = 9","x = 21","x = 15"], c:1, e:"x/3 = 7, x = 21"},
     {q:"Convert 7/20 to a percent:", a:["35%","70%","20%"], c:0, e:"7÷20 = 0.35 = 35%"},
-    {q:"Solve: 5(x - 2) = 30", a:["x = 8","x = 4","x = 6"], c:0, e:"5x - 10 = 30, 5x = 40, x = 8"},
-    {q:"What is the GCF of 12 and 18?", a:["6","3","12"], c:0, e:"Factors of 12: 1,2,3,4,6,12. Factors of 18: 1,2,3,6,9,18. GCF=6"},
+    {q:"Solve: 5(x - 2) = 30", a:["x = 4","x = 8","x = 6"], c:1, e:"5x - 10 = 30, 5x = 40, x = 8"},
+    {q:"What is the GCF of 12 and 18?", a:["6","12","3"], c:0, e:"Factors of 12: 1,2,3,4,6,12. Factors of 18: 1,2,3,6,9,18. GCF=6"},
     {q:"What is the LCM of 4 and 6?", a:["12","24","6"], c:0, e:"Multiples of 4: 4,8,12... Multiples of 6: 6,12... LCM=12"},
     {q:"Solve: |−9| = ?", a:["9","-9","0"], c:0, e:"Absolute value = distance from 0, always positive."},
-    {q:"If y = 3x + 2, what is y when x = 4?", a:["14","12","10"], c:0, e:"y = 3(4) + 2 = 12 + 2 = 14"},
-    {q:"Solve: 2(x + 3) = 5x - 6", a:["x = 4","x = 3","x = 6"], c:0, e:"2x+6 = 5x-6, 12 = 3x, x = 4"},
+    {q:"If y = 3x + 2, what is y when x = 4?", a:["12","14","10"], c:1, e:"y = 3(4) + 2 = 12 + 2 = 14"},
+    {q:"Solve: 2(x + 3) = 5x - 6", a:["x = 3","x = 4","x = 6"], c:1, e:"2x+6 = 5x-6, 12 = 3x, x = 4"},
     {q:"Which is bigger: 3/5 or 4/7?", a:["3/5","4/7","They're equal"], c:0, e:"3/5=0.6, 4/7≈0.571. 0.6 > 0.571"},
     {q:"A shirt is $40 with 25% off. Sale price?", a:["$30","$35","$25"], c:0, e:"25% of 40 = $10 off. $40 - $10 = $30"},
-    {q:"Solve: -3(x + 4) = -21", a:["x = 3","x = -3","x = 7"], c:0, e:"-3x - 12 = -21, -3x = -9, x = 3"},
-    {q:"What is 0.75 as a fraction?", a:["3/4","7/5","75/10"], c:0, e:"0.75 = 75/100 = 3/4"},
-    {q:"Solve: 4/x = 8/14", a:["x = 7","x = 4","x = 28"], c:0, e:"Cross multiply: 4×14 = 8x, 56 = 8x, x = 7"},
+    {q:"Solve: -3(x + 4) = -21", a:["x = 7","x = -3","x = 3"], c:2, e:"-3x - 12 = -21, -3x = -9, x = 3"},
+    {q:"What is 0.75 as a fraction?", a:["75/10","3/4","7/5"], c:1, e:"0.75 = 75/100 = 3/4"},
+    {q:"Solve: 4/x = 8/14", a:["x = 28","x = 7","x = 4"], c:1, e:"Cross multiply: 4×14 = 8x, 56 = 8x, x = 7"},
     {q:"What is (-2)³?", a:["-8","8","6"], c:0, e:"(-2)×(-2)×(-2) = 4×(-2) = -8"},
-    {q:"A car goes 180 mi on 6 gallons. Miles per gallon?", a:["30 mpg","18 mpg","36 mpg"], c:0, e:"180 ÷ 6 = 30 mpg"},
-    {q:"Solve: x + (-4) = 12", a:["x = 16","x = 8","x = -16"], c:0, e:"x - 4 = 12, x = 16"},
+    {q:"A car goes 180 mi on 6 gallons. Miles per gallon?", a:["18 mpg","30 mpg","36 mpg"], c:1, e:"180 ÷ 6 = 30 mpg"},
+    {q:"Solve: x + (-4) = 12", a:["x = 8","x = 16","x = -16"], c:1, e:"x - 4 = 12, x = 16"},
     {q:"What is 2/3 of 45?", a:["30","15","22.5"], c:0, e:"45 × 2/3 = 90/3 = 30"},
-    {q:"Solve: -x = 7", a:["x = -7","x = 7","x = 0"], c:0, e:"Multiply both sides by -1: x = -7"},
-    {q:"200 m in 25 sec vs 150 m in 20 sec. Which is faster?", a:["200m in 25s (8 m/s)","150m in 20s (7.5 m/s)","Same speed"], c:0, e:"200÷25=8 m/s vs 150÷20=7.5 m/s. 8 > 7.5"},
-    {q:"2 cups rice feeds 6 people. How much for 15 people?", a:["5 cups","4 cups","6 cups"], c:0, e:"2/6 = x/15, 6x=30, x=5 cups"},
+    {q:"Solve: -x = 7", a:["x = 7","x = -7","x = 0"], c:1, e:"Multiply both sides by -1: x = -7"},
+    {q:"200 m in 25 sec vs 150 m in 20 sec. Which is faster?", a:["Same speed","150m in 20s (7.5 m/s)","200m in 25s (8 m/s)"], c:2, e:"200÷25=8 m/s vs 150÷20=7.5 m/s. 8 > 7.5"},
+    {q:"2 cups rice feeds 6 people. How much for 15 people?", a:["4 cups","6 cups","5 cups"], c:2, e:"2/6 = x/15, 6x=30, x=5 cups"},
     {q:"Solve: 7 - 2x = 1", a:["x = 3","x = -3","x = 4"], c:0, e:"−2x = −6, x = 3"},
-    {q:"On a map 2cm = 5km. Towns are 8cm apart. Real distance?", a:["20 km","16 km","40 km"], c:0, e:"2/5 = 8/x, 2x=40, x=20 km"},
-    {q:"What is 1/3 + 1/6?", a:["1/2","2/9","2/6"], c:0, e:"LCD=6: 2/6 + 1/6 = 3/6 = 1/2"},
-    {q:"Solve: 10 - 3x = -5", a:["x = 5","x = -5","x = 3"], c:0, e:"-3x = -15, x = 5"},
-    {q:"What is 3² + 4²?", a:["25","7","49"], c:0, e:"9 + 16 = 25 (this is also 5²!)"},
-    {q:"You earn $45 for 5 hours. How much for 8 hours?", a:["$72","$80","$56"], c:0, e:"$45÷5 = $9/hr. $9×8 = $72"},
-    {q:"Solve: x² = 49", a:["x = 7 or x = -7","x = 7 only","x = 49"], c:0, e:"Both 7² and (-7)² equal 49."},
-    {q:"What is 125% as a decimal?", a:["1.25","0.125","12.5"], c:0, e:"125 ÷ 100 = 1.25"},
-    {q:"Simplify: 4x + 3x - 2x", a:["5x","9x","x"], c:0, e:"Like terms: (4+3-2)x = 5x"},
-    {q:"If a triangle has angles 50° and 60°, what's the third?", a:["70°","80°","90°"], c:0, e:"Angles sum to 180°: 180-50-60 = 70°"},
-    {q:"Solve: 2(3x - 1) = 16", a:["x = 3","x = 6","x = 2"], c:0, e:"6x - 2 = 16, 6x = 18, x = 3"},
-    {q:"What is the mean of 4, 8, 6, 10, 12?", a:["8","6","10"], c:0, e:"Sum = 40, count = 5, mean = 40÷5 = 8"}
+    {q:"On a map 2cm = 5km. Towns are 8cm apart. Real distance?", a:["40 km","20 km","16 km"], c:1, e:"2/5 = 8/x, 2x=40, x=20 km"},
+    {q:"What is 1/3 + 1/6?", a:["2/6","2/9","1/2"], c:2, e:"LCD=6: 2/6 + 1/6 = 3/6 = 1/2"},
+    {q:"Solve: 10 - 3x = -5", a:["x = 3","x = 5","x = -5"], c:1, e:"-3x = -15, x = 5"},
+    {q:"What is 3² + 4²?", a:["7","49","25"], c:2, e:"9 + 16 = 25 (this is also 5²!)"},
+    {q:"You earn $45 for 5 hours. How much for 8 hours?", a:["$80","$72","$56"], c:1, e:"$45÷5 = $9/hr. $9×8 = $72"},
+    {q:"Solve: x² = 49", a:["x = 49","x = 7 only","x = 7 or x = -7"], c:2, e:"Both 7² and (-7)² equal 49."},
+    {q:"What is 125% as a decimal?", a:["0.125","12.5","1.25"], c:2, e:"125 ÷ 100 = 1.25"},
+    {q:"Simplify: 4x + 3x - 2x", a:["x","9x","5x"], c:2, e:"Like terms: (4+3-2)x = 5x"},
+    {q:"If a triangle has angles 50° and 60°, what's the third?", a:["80°","70°","90°"], c:1, e:"Angles sum to 180°: 180-50-60 = 70°"},
+    {q:"Solve: 2(3x - 1) = 16", a:["x = 3","x = 2","x = 6"], c:0, e:"6x - 2 = 16, 6x = 18, x = 3"},
+    {q:"What is the mean of 4, 8, 6, 10, 12?", a:["6","10","8"], c:2, e:"Sum = 40, count = 5, mean = 40÷5 = 8"}
 ],
 science: [
     {q:"What organelle is known as the 'powerhouse' of the cell?", a:["Mitochondria","Nucleus","Ribosome"], c:0, e:"Mitochondria generates chemical energy (ATP) for the cell."},
-    {q:"What is the primary energy source for most ecosystems?", a:["The Sun","Water","Soil"], c:0, e:"The Sun drives photosynthesis, which starts the food chain."},
-    {q:"Name the three primary layers of Earth (outside in):", a:["Crust, mantle, core","Rock, magma, iron","Surface, middle, center"], c:0, e:"Crust (thin outer), mantle (thick middle), core (dense center)."},
-    {q:"Water turning from liquid to gas is called:", a:["Evaporation","Condensation","Precipitation"], c:0, e:"Evaporation = liquid → gas phase change."},
-    {q:"What is the difference between an atom and a molecule?", a:["Atom is one unit; molecule is atoms bonded together","They're the same","Molecule is smaller"], c:0, e:"Atoms combine/bond to form molecules."},
-    {q:"What happens at a convergent plate boundary?", a:["Mountains, earthquakes, or volcanoes","New ocean floor forms","Plates slide past smoothly"], c:0, e:"Convergent = plates collide → mountains/quakes."},
-    {q:"What happens to water molecules when boiled?", a:["Speed up and spread apart","Slow down and stick together","Disappear"], c:0, e:"Heat energy breaks bonds, molecules move faster."},
-    {q:"Plants make food from sunlight. This process is:", a:["Photosynthesis","Respiration","Fermentation"], c:0, e:"Photo (light) + synthesis (making) = making food from light."},
-    {q:"What does DNA stand for?", a:["Deoxyribonucleic acid","Direct Nucleic Acid","Double Nucleus Assembly"], c:0, e:"DNA = deoxyribonucleic acid, the blueprint of life."},
-    {q:"What part of the cell contains DNA?", a:["Nucleus","Mitochondria","Cell membrane"], c:0, e:"The nucleus is the 'control center' holding genetic info."},
-    {q:"What is the chemical formula for water?", a:["H₂O","CO₂","O₂"], c:0, e:"2 hydrogen atoms + 1 oxygen atom = H₂O"},
-    {q:"What is the chemical formula for carbon dioxide?", a:["CO₂","H₂O","NaCl"], c:0, e:"1 carbon + 2 oxygen atoms = CO₂"},
-    {q:"Which state of matter has a fixed shape AND volume?", a:["Solid","Liquid","Gas"], c:0, e:"Solids keep their shape; liquids and gases take container shape."},
-    {q:"Which state of matter takes the shape of its container but has fixed volume?", a:["Liquid","Solid","Gas"], c:0, e:"Liquids flow to fill container shape but keep same volume."},
-    {q:"What causes Earth's tectonic plates to move?", a:["Convection currents in the mantle","Wind on the surface","The Moon's gravity"], c:0, e:"Hot mantle rock rises, cools, and sinks in circular currents."},
+    {q:"What is the primary energy source for most ecosystems?", a:["The Sun","Soil","Water"], c:0, e:"The Sun drives photosynthesis, which starts the food chain."},
+    {q:"Name the three primary layers of Earth (outside in):", a:["Crust, mantle, core","Surface, middle, center","Rock, magma, iron"], c:0, e:"Crust (thin outer), mantle (thick middle), core (dense center)."},
+    {q:"Water turning from liquid to gas is called:", a:["Condensation","Precipitation","Evaporation"], c:2, e:"Evaporation = liquid → gas phase change."},
+    {q:"What is the difference between an atom and a molecule?", a:["They're the same","Molecule is smaller","Atom is one unit; molecule is atoms bonded together"], c:2, e:"Atoms combine/bond to form molecules."},
+    {q:"What happens at a convergent plate boundary?", a:["Plates slide past smoothly","Mountains, earthquakes, or volcanoes","New ocean floor forms"], c:1, e:"Convergent = plates collide → mountains/quakes."},
+    {q:"What happens to water molecules when boiled?", a:["Slow down and stick together","Speed up and spread apart","Disappear"], c:1, e:"Heat energy breaks bonds, molecules move faster."},
+    {q:"Plants make food from sunlight. This process is:", a:["Respiration","Photosynthesis","Fermentation"], c:1, e:"Photo (light) + synthesis (making) = making food from light."},
+    {q:"What does DNA stand for?", a:["Direct Nucleic Acid","Double Nucleus Assembly","Deoxyribonucleic acid"], c:2, e:"DNA = deoxyribonucleic acid, the blueprint of life."},
+    {q:"What part of the cell contains DNA?", a:["Mitochondria","Nucleus","Cell membrane"], c:1, e:"The nucleus is the 'control center' holding genetic info."},
+    {q:"What is the chemical formula for water?", a:["CO₂","O₂","H₂O"], c:2, e:"2 hydrogen atoms + 1 oxygen atom = H₂O"},
+    {q:"What is the chemical formula for carbon dioxide?", a:["NaCl","H₂O","CO₂"], c:2, e:"1 carbon + 2 oxygen atoms = CO₂"},
+    {q:"Which state of matter has a fixed shape AND volume?", a:["Liquid","Gas","Solid"], c:2, e:"Solids keep their shape; liquids and gases take container shape."},
+    {q:"Which state of matter takes the shape of its container but has fixed volume?", a:["Liquid","Gas","Solid"], c:0, e:"Liquids flow to fill container shape but keep same volume."},
+    {q:"What causes Earth's tectonic plates to move?", a:["Wind on the surface","The Moon's gravity","Convection currents in the mantle"], c:2, e:"Hot mantle rock rises, cools, and sinks in circular currents."},
     {q:"What type of rock forms from cooled magma or lava?", a:["Igneous","Sedimentary","Metamorphic"], c:0, e:"Igneous = from fire. Magma cools → solid rock."},
-    {q:"What type of rock forms from layers compressed over time?", a:["Sedimentary","Igneous","Metamorphic"], c:0, e:"Sediment layers pile up and are pressed into rock."},
-    {q:"What changes sedimentary rock into metamorphic rock?", a:["Extreme heat and pressure","Water erosion","Freezing"], c:0, e:"Deep underground heat + pressure transforms rock."},
-    {q:"What gas do plants release during photosynthesis?", a:["Oxygen (O₂)","Carbon dioxide (CO₂)","Nitrogen (N₂)"], c:0, e:"Plants take in CO₂ and release O₂ as a byproduct."},
+    {q:"What type of rock forms from layers compressed over time?", a:["Metamorphic","Igneous","Sedimentary"], c:2, e:"Sediment layers pile up and are pressed into rock."},
+    {q:"What changes sedimentary rock into metamorphic rock?", a:["Freezing","Extreme heat and pressure","Water erosion"], c:1, e:"Deep underground heat + pressure transforms rock."},
+    {q:"What gas do plants release during photosynthesis?", a:["Carbon dioxide (CO₂)","Nitrogen (N₂)","Oxygen (O₂)"], c:2, e:"Plants take in CO₂ and release O₂ as a byproduct."},
     {q:"What gas do humans exhale?", a:["Carbon dioxide (CO₂)","Oxygen (O₂)","Hydrogen (H₂)"], c:0, e:"We breathe in O₂ and breathe out CO₂."},
-    {q:"Rust forming on iron is a chemical or physical change?", a:["Chemical change","Physical change","Neither"], c:0, e:"New substance (iron oxide) forms. Can't easily reverse."},
-    {q:"Ice melting is a chemical or physical change?", a:["Physical change","Chemical change","Neither"], c:0, e:"Still H₂O, just changed state. Easily reversible."},
-    {q:"What organ system includes the heart and blood vessels?", a:["Circulatory system","Respiratory system","Digestive system"], c:0, e:"The circulatory system pumps blood throughout the body."},
-    {q:"What is the function of the respiratory system?", a:["Exchange oxygen and carbon dioxide","Digest food","Filter blood"], c:0, e:"Lungs bring in O₂ and remove CO₂ from blood."},
-    {q:"What is an ecosystem?", a:["Living things + their physical environment interacting","Just animals in an area","Only the plants in a forest"], c:0, e:"Ecosystem = all living (biotic) + non-living (abiotic) things interacting."},
+    {q:"Rust forming on iron is a chemical or physical change?", a:["Chemical change","Neither","Physical change"], c:0, e:"New substance (iron oxide) forms. Can't easily reverse."},
+    {q:"Ice melting is a chemical or physical change?", a:["Physical change","Neither","Chemical change"], c:0, e:"Still H₂O, just changed state. Easily reversible."},
+    {q:"What organ system includes the heart and blood vessels?", a:["Respiratory system","Circulatory system","Digestive system"], c:1, e:"The circulatory system pumps blood throughout the body."},
+    {q:"What is the function of the respiratory system?", a:["Digest food","Exchange oxygen and carbon dioxide","Filter blood"], c:1, e:"Lungs bring in O₂ and remove CO₂ from blood."},
+    {q:"What is an ecosystem?", a:["Only the plants in a forest","Just animals in an area","Living things + their physical environment interacting"], c:2, e:"Ecosystem = all living (biotic) + non-living (abiotic) things interacting."},
     {q:"What is a food chain?", a:["The path of energy from one organism to another","A grocery store list","How food is cooked"], c:0, e:"Sun → producer → primary consumer → secondary consumer..."},
-    {q:"What is a producer in an ecosystem?", a:["An organism that makes its own food (like plants)","An animal that hunts","A decomposer"], c:0, e:"Producers = plants/algae that photosynthesize."},
-    {q:"What is a decomposer?", a:["Organism that breaks down dead matter","An animal that hunts prey","A plant that makes food"], c:0, e:"Fungi and bacteria decompose dead organisms, recycling nutrients."},
+    {q:"What is a producer in an ecosystem?", a:["An animal that hunts","A decomposer","An organism that makes its own food (like plants)"], c:2, e:"Producers = plants/algae that photosynthesize."},
+    {q:"What is a decomposer?", a:["An animal that hunts prey","A plant that makes food","Organism that breaks down dead matter"], c:2, e:"Fungi and bacteria decompose dead organisms, recycling nutrients."},
     {q:"What determines what element an atom is?", a:["Number of protons","Number of electrons","Size of the atom"], c:0, e:"Proton count = atomic number = element identity."},
-    {q:"What charge does a proton have?", a:["Positive (+)","Negative (-)","Neutral (0)"], c:0, e:"Protons are positive, in the nucleus."},
-    {q:"What charge does an electron have?", a:["Negative (-)","Positive (+)","Neutral (0)"], c:0, e:"Electrons are negative, orbiting the nucleus."},
-    {q:"What charge does a neutron have?", a:["Neutral (0)","Positive (+)","Negative (-)"], c:0, e:"Neutrons have no charge (neutral), found in nucleus."},
-    {q:"What is the pH of a neutral substance?", a:["7","0","14"], c:0, e:"pH 7 = neutral. Below 7 = acid. Above 7 = base."},
-    {q:"Which is an acid: lemon juice or soap?", a:["Lemon juice","Soap","Both"], c:0, e:"Lemon juice is acidic (pH ~2). Soap is basic (pH ~9-10)."},
-    {q:"What is Newton's First Law of Motion?", a:["An object stays at rest or in motion unless a force acts on it","Force = mass × acceleration","Every action has an equal reaction"], c:0, e:"Also called the Law of Inertia."},
-    {q:"What is the formula for speed?", a:["Speed = distance ÷ time","Speed = time ÷ distance","Speed = distance × time"], c:0, e:"Speed tells you how far you go per unit of time."},
-    {q:"What type of energy does a moving object have?", a:["Kinetic energy","Potential energy","Thermal energy"], c:0, e:"Kinetic = energy of motion. Faster = more kinetic energy."},
-    {q:"What type of energy does a stretched rubber band have?", a:["Potential energy (elastic)","Kinetic energy","Sound energy"], c:0, e:"Stored energy ready to be released = potential energy."},
-    {q:"What is gravity?", a:["Force that pulls objects toward each other","Force that pushes objects apart","Energy from the Sun"], c:0, e:"Gravity attracts all objects with mass toward each other."},
-    {q:"Sound travels fastest through:", a:["Solids","Liquids","Gases"], c:0, e:"Particles closer together = faster sound travel. Solid > liquid > gas."},
-    {q:"Light travels fastest through:", a:["Vacuum (empty space)","Water","Glass"], c:0, e:"Light is fastest with nothing in the way (speed of light in vacuum)."},
-    {q:"What causes seasons on Earth?", a:["Earth's tilted axis as it orbits the Sun","Distance from the Sun","The Moon's position"], c:0, e:"The 23.5° tilt causes different areas to get more/less direct sunlight."},
-    {q:"How long does Earth take to orbit the Sun?", a:["365.25 days (1 year)","24 hours","30 days"], c:0, e:"One full orbit = one year. The .25 is why we have leap years."},
-    {q:"How long does Earth take to rotate once on its axis?", a:["24 hours (1 day)","365 days","1 month"], c:0, e:"One rotation = one day/night cycle."},
-    {q:"What causes ocean tides?", a:["The Moon's gravitational pull","Wind","Earth's rotation alone"], c:0, e:"The Moon's gravity pulls ocean water, creating high and low tides."},
-    {q:"What is the water cycle in order?", a:["Evaporation → Condensation → Precipitation","Precipitation → Evaporation → Condensation","Condensation → Precipitation → Evaporation"], c:0, e:"Water evaporates, forms clouds (condenses), falls as rain (precipitates)."},
-    {q:"What happens during condensation?", a:["Gas turns to liquid (clouds form)","Liquid turns to gas","Solid turns to liquid"], c:0, e:"Water vapor cools and turns back into tiny liquid droplets."},
+    {q:"What charge does a proton have?", a:["Neutral (0)","Negative (-)","Positive (+)"], c:2, e:"Protons are positive, in the nucleus."},
+    {q:"What charge does an electron have?", a:["Neutral (0)","Positive (+)","Negative (-)"], c:2, e:"Electrons are negative, orbiting the nucleus."},
+    {q:"What charge does a neutron have?", a:["Negative (-)","Neutral (0)","Positive (+)"], c:1, e:"Neutrons have no charge (neutral), found in nucleus."},
+    {q:"What is the pH of a neutral substance?", a:["14","0","7"], c:2, e:"pH 7 = neutral. Below 7 = acid. Above 7 = base."},
+    {q:"Which is an acid: lemon juice or soap?", a:["Soap","Lemon juice","Both"], c:1, e:"Lemon juice is acidic (pH ~2). Soap is basic (pH ~9-10)."},
+    {q:"What is Newton's First Law of Motion?", a:["Force = mass × acceleration","Every action has an equal reaction","An object stays at rest or in motion unless a force acts on it"], c:2, e:"Also called the Law of Inertia."},
+    {q:"What is the formula for speed?", a:["Speed = time ÷ distance","Speed = distance × time","Speed = distance ÷ time"], c:2, e:"Speed tells you how far you go per unit of time."},
+    {q:"What type of energy does a moving object have?", a:["Thermal energy","Potential energy","Kinetic energy"], c:2, e:"Kinetic = energy of motion. Faster = more kinetic energy."},
+    {q:"What type of energy does a stretched rubber band have?", a:["Potential energy (elastic)","Sound energy","Kinetic energy"], c:0, e:"Stored energy ready to be released = potential energy."},
+    {q:"What is gravity?", a:["Energy from the Sun","Force that pushes objects apart","Force that pulls objects toward each other"], c:2, e:"Gravity attracts all objects with mass toward each other."},
+    {q:"Sound travels fastest through:", a:["Liquids","Gases","Solids"], c:2, e:"Particles closer together = faster sound travel. Solid > liquid > gas."},
+    {q:"Light travels fastest through:", a:["Glass","Vacuum (empty space)","Water"], c:1, e:"Light is fastest with nothing in the way (speed of light in vacuum)."},
+    {q:"What causes seasons on Earth?", a:["Earth's tilted axis as it orbits the Sun","The Moon's position","Distance from the Sun"], c:0, e:"The 23.5° tilt causes different areas to get more/less direct sunlight."},
+    {q:"How long does Earth take to orbit the Sun?", a:["365.25 days (1 year)","30 days","24 hours"], c:0, e:"One full orbit = one year. The .25 is why we have leap years."},
+    {q:"How long does Earth take to rotate once on its axis?", a:["24 hours (1 day)","1 month","365 days"], c:0, e:"One rotation = one day/night cycle."},
+    {q:"What causes ocean tides?", a:["Wind","Earth's rotation alone","The Moon's gravitational pull"], c:2, e:"The Moon's gravity pulls ocean water, creating high and low tides."},
+    {q:"What is the water cycle in order?", a:["Condensation → Precipitation → Evaporation","Evaporation → Condensation → Precipitation","Precipitation → Evaporation → Condensation"], c:1, e:"Water evaporates, forms clouds (condenses), falls as rain (precipitates)."},
+    {q:"What happens during condensation?", a:["Liquid turns to gas","Solid turns to liquid","Gas turns to liquid (clouds form)"], c:2, e:"Water vapor cools and turns back into tiny liquid droplets."},
     {q:"What layer of Earth's atmosphere do we live in?", a:["Troposphere","Stratosphere","Mesosphere"], c:0, e:"The troposphere is the lowest layer where weather happens."},
-    {q:"What gas makes up most of Earth's atmosphere?", a:["Nitrogen (~78%)","Oxygen (~21%)","Carbon dioxide"], c:0, e:"Atmosphere: ~78% nitrogen, ~21% oxygen, ~1% other gases."},
+    {q:"What gas makes up most of Earth's atmosphere?", a:["Oxygen (~21%)","Carbon dioxide","Nitrogen (~78%)"], c:2, e:"Atmosphere: ~78% nitrogen, ~21% oxygen, ~1% other gases."},
     {q:"What is natural selection?", a:["Organisms better adapted to their environment survive and reproduce more","Animals choosing their food","Humans selecting pets"], c:0, e:"'Survival of the fittest' — traits that help survival get passed on."},
-    {q:"What is an adaptation?", a:["A trait that helps an organism survive in its environment","A type of disease","A chemical reaction"], c:0, e:"Example: polar bear's thick fur is an adaptation to cold."},
-    {q:"What is the difference between a cell membrane and a cell wall?", a:["All cells have membranes; only plant cells have walls too","They're the same thing","Only animal cells have walls"], c:0, e:"Cell wall (plants only) = rigid outer layer. Membrane = flexible barrier."},
-    {q:"What does chlorophyll do?", a:["Absorbs sunlight for photosynthesis (makes plants green)","Helps animals breathe","Breaks down food in the stomach"], c:0, e:"Chlorophyll captures light energy and gives plants their green color."},
-    {q:"What is a watershed?", a:["An area of land where all water drains to one body of water","A building that stores water","A type of dam"], c:0, e:"All rain in a watershed flows to the same river, lake, or ocean."},
-    {q:"What causes a volcanic eruption?", a:["Pressure from magma rising to the surface","Cold weather","Earthquakes only"], c:0, e:"Magma builds up pressure underground until it breaks through."},
-    {q:"What is the ozone layer and why is it important?", a:["Protects Earth from harmful UV radiation","Makes rain possible","Holds oxygen near the surface"], c:0, e:"Ozone (O₃) in the stratosphere blocks dangerous ultraviolet rays."},
-    {q:"Fossil fuels (coal, oil, gas) are formed from:", a:["Ancient dead organisms compressed over millions of years","Rocks melting","Volcanic eruptions"], c:0, e:"Dead plants/animals buried and compressed = fossil fuels."},
-    {q:"What is the difference between renewable and non-renewable energy?", a:["Renewable replenishes naturally; non-renewable runs out","They're the same","Renewable is more expensive"], c:0, e:"Solar, wind = renewable. Coal, oil = non-renewable (limited supply)."},
-    {q:"What type of plate boundary creates new ocean floor?", a:["Divergent","Convergent","Transform"], c:0, e:"Plates pull apart → magma rises → new crust forms (mid-ocean ridges)."},
-    {q:"What evidence proved continents were once connected?", a:["Matching fossils and rock types on different continents","Similar weather patterns","Identical languages"], c:0, e:"Same fossils on Africa & South America = they were once joined (Pangaea)."}
+    {q:"What is an adaptation?", a:["A type of disease","A trait that helps an organism survive in its environment","A chemical reaction"], c:1, e:"Example: polar bear's thick fur is an adaptation to cold."},
+    {q:"What is the difference between a cell membrane and a cell wall?", a:["They're the same thing","Only animal cells have walls","All cells have membranes; only plant cells have walls too"], c:2, e:"Cell wall (plants only) = rigid outer layer. Membrane = flexible barrier."},
+    {q:"What does chlorophyll do?", a:["Helps animals breathe","Breaks down food in the stomach","Absorbs sunlight for photosynthesis (makes plants green)"], c:2, e:"Chlorophyll captures light energy and gives plants their green color."},
+    {q:"What is a watershed?", a:["A building that stores water","An area of land where all water drains to one body of water","A type of dam"], c:1, e:"All rain in a watershed flows to the same river, lake, or ocean."},
+    {q:"What causes a volcanic eruption?", a:["Cold weather","Pressure from magma rising to the surface","Earthquakes only"], c:1, e:"Magma builds up pressure underground until it breaks through."},
+    {q:"What is the ozone layer and why is it important?", a:["Holds oxygen near the surface","Protects Earth from harmful UV radiation","Makes rain possible"], c:1, e:"Ozone (O₃) in the stratosphere blocks dangerous ultraviolet rays."},
+    {q:"Fossil fuels (coal, oil, gas) are formed from:", a:["Rocks melting","Ancient dead organisms compressed over millions of years","Volcanic eruptions"], c:1, e:"Dead plants/animals buried and compressed = fossil fuels."},
+    {q:"What is the difference between renewable and non-renewable energy?", a:["They're the same","Renewable replenishes naturally; non-renewable runs out","Renewable is more expensive"], c:1, e:"Solar, wind = renewable. Coal, oil = non-renewable (limited supply)."},
+    {q:"What type of plate boundary creates new ocean floor?", a:["Convergent","Divergent","Transform"], c:1, e:"Plates pull apart → magma rises → new crust forms (mid-ocean ridges)."},
+    {q:"What evidence proved continents were once connected?", a:["Matching fossils and rock types on different continents","Identical languages","Similar weather patterns"], c:0, e:"Same fossils on Africa & South America = they were once joined (Pangaea)."}
 ]
 };
 
@@ -559,8 +561,8 @@ function renderQuiz() {
         let html = `<p>${i+1}. ${q.q}</p>`;
         answerIndices.forEach((ai, li) => {
             const letter = ['A','B','C'][li];
-            html += `<label onclick="handleQuizAnswer(this, ${li === correctIdx}, 'dq-${i}')">
-                <input type="radio" name="dq-${i}"> ${letter}) ${q.a[ai]}</label>`;
+            html += `<div class="answer-btn" data-correct="${li === correctIdx}" data-question="dq-${i}" onclick="handleQuizAnswer(this, ${li === correctIdx}, 'dq-${i}')">
+                ${letter}) ${q.a[ai]}</div>`;
         });
         html += `<div class="explanation">${q.e}</div>`;
         qDiv.innerHTML = html;
@@ -568,24 +570,27 @@ function renderQuiz() {
     });
 }
 
-function handleQuizAnswer(label, isCorrect, questionId) {
+function handleQuizAnswer(el, isCorrect, questionId) {
     const question = document.getElementById(questionId);
     if (question.dataset.answered) return;
     question.dataset.answered = 'true';
     quizTotal++;
 
     if (isCorrect) {
-        label.classList.add('correct');
+        el.classList.add('correct');
         quizCorrect++;
     } else {
-        label.classList.add('wrong');
-        // Highlight correct
-        question.querySelectorAll('label').forEach(l => {
-            if (l.onclick.toString().includes('true,')) l.classList.add('correct');
+        el.classList.add('wrong');
+        // Highlight the correct answer
+        question.querySelectorAll('.answer-btn').forEach(btn => {
+            if (btn.dataset.correct === 'true') btn.classList.add('correct');
         });
     }
     // Disable other options
-    question.querySelectorAll('label').forEach(l => { if (!l.classList.contains('correct') && !l.classList.contains('wrong')) l.classList.add('disabled'); });
+    question.querySelectorAll('.answer-btn').forEach(btn => {
+        if (!btn.classList.contains('correct') && !btn.classList.contains('wrong')) btn.classList.add('disabled');
+        btn.style.pointerEvents = 'none';
+    });
     question.querySelector('.explanation').style.display = 'block';
 
     // Check if all 20 answered

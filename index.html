@@ -620,6 +620,33 @@ function getQuizScores() { return JSON.parse(localStorage.getItem('aaden-scores'
 function saveQuizScore(id, score) {
     const s = getQuizScores(); s[id] = score;
     localStorage.setItem('aaden-scores', JSON.stringify(s));
+    autoCheckProgress(id, score);
+}
+
+function autoCheckProgress(id, score) {
+    const pct = Math.round((score.correct / score.total) * 100);
+    const progress = getProgress();
+    const map = {
+        ela:      { 70: 'w1-ela-vocab', 80: 'w2-fireburn', 90: 'w3-vocabulary' },
+        math:    { 70: 'w1-math-diag', 80: 'w2-integers', 90: 'w3-equations' },
+        science: { 70: 'w1-sci-diag', 80: 'w2-atoms', 90: 'w3-tectonics' },
+        spelling:{ 70: 'w2-spelling2', 85: 'w3-spelling3' }
+    };
+    const thresholds = map[id];
+    if (!thresholds) return;
+    Object.entries(thresholds).forEach(([threshold, task]) => {
+        if (pct >= Number(threshold)) progress[task] = true;
+    });
+    // Perfect spelling = 20/20
+    if (id === 'spelling' && score.correct === 20) progress['w4-proportions'] = true;
+    // Week 4: all three quizzes at 95%+
+    const scores = getQuizScores();
+    const elaPct = scores.ela ? Math.round((scores.ela.correct / scores.ela.total) * 100) : 0;
+    const mathPct = scores.math ? Math.round((scores.math.correct / scores.math.total) * 100) : 0;
+    const sciPct = scores.science ? Math.round((scores.science.correct / scores.science.total) * 100) : 0;
+    if (elaPct >= 95 && mathPct >= 95 && sciPct >= 95) progress['w4-inference'] = true;
+    saveProgress(progress);
+    updateProgressUI();
 }
 
 function toggleTask(el) {
@@ -631,7 +658,28 @@ function toggleTask(el) {
 }
 
 function updateProgressUI() {
+    // Retroactively credit any existing quiz scores
+    const scores = getQuizScores();
     const progress = getProgress();
+    const map = {
+        ela:      { 70: 'w1-ela-vocab', 80: 'w2-fireburn', 90: 'w3-vocabulary' },
+        math:    { 70: 'w1-math-diag', 80: 'w2-integers', 90: 'w3-equations' },
+        science: { 70: 'w1-sci-diag', 80: 'w2-atoms', 90: 'w3-tectonics' },
+        spelling:{ 70: 'w2-spelling2', 85: 'w3-spelling3' }
+    };
+    Object.entries(scores).forEach(([id, score]) => {
+        if (!score || score.correct == null) return;
+        const pct = Math.round((score.correct / score.total) * 100);
+        const thresholds = map[id];
+        if (thresholds) Object.entries(thresholds).forEach(([t, task]) => { if (pct >= Number(t)) progress[task] = true; });
+        if (id === 'spelling' && score.correct === 20) progress['w4-proportions'] = true;
+    });
+    const elaPct = scores.ela ? Math.round((scores.ela.correct / scores.ela.total) * 100) : 0;
+    const mathPct = scores.math ? Math.round((scores.math.correct / scores.math.total) * 100) : 0;
+    const sciPct = scores.science ? Math.round((scores.science.correct / scores.science.total) * 100) : 0;
+    if (elaPct >= 95 && mathPct >= 95 && sciPct >= 95) progress['w4-inference'] = true;
+    saveProgress(progress);
+
     const checks = document.querySelectorAll('.tracker-check');
     let done = 0;
     checks.forEach(el => {
